@@ -1,0 +1,6 @@
+# Documenti interni di lavoro (non pubblicati)
+docs/
+
+# Log e file temporanei
+*.log
+.DS_Store

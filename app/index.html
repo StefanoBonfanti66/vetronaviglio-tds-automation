@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TDS Automation – POC Vetronaviglio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Generatore TDS <span class="sub">POC – Vetronaviglio</span></h1>
+    <p class="tagline">Compila il form e genera l'<strong>unico PDF</strong> della Technical Data Sheet.</p>
+  </header>
+
+  <main>
+    <form id="tdsForm" class="card">
+      <section>
+        <h2>1 · Dati generali</h2>
+        <div class="grid">
+          <label>Data di creazione
+            <input type="date" id="dataCreazione" required />
+          </label>
+          <label>Revisione
+            <input type="text" id="revisione" value="5" />
+          </label>
+          <label class="full">Nome articolo
+            <input type="text" id="nomeArticolo" value="FLAC. KAPPA 150 PEHD ST NERO COPRENTE B/FOAMER - SER. PURE FOAM CLEANSER - ALLINEATO" />
+          </label>
+          <label class="full">Codice articolo
+            <input type="text" id="codiceArticolo" value="FC150.0469" />
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>2 · Materiali e conformità</h2>
+        <div class="grid">
+          <label>Materiale
+            <select id="materiale">
+              <option value="pehd">PEHD (High Density Polyethylene)</option>
+              <option value="pe_pp_coprente">PE/PP coprente senza food contact</option>
+              <option value="pe_pcr">PE PCR</option>
+              <option value="pp_pcr">PP PCR</option>
+              <option value="pet">PET</option>
+            </select>
+          </label>
+          <label class="checkbox-line">
+            <input type="checkbox" id="isPCR" />
+            <span><strong>Materiale PCR</strong> (PE PCR / PP PCR) → rimuovi il paragrafo food contact</span>
+          </label>
+          <p class="hint full" id="foodContactAlert" hidden>⚠ Hai selezionato plastica PCR: il paragrafo relativo al food contact verrà <strong>rimosso</strong> dalla TDS.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>3 · Etichettatura (1-C)</h2>
+        <div class="grid">
+          <label>Pack Coding
+            <select id="packCoding">
+              <option value="HDPE 2">HDPE 2</option>
+              <option value="PP 5">PP 5</option>
+              <option value="PET 1">PET 1</option>
+              <option value="GL 70">GL 70 (vetro)</option>
+            </select>
+          </label>
+          <label>Collection type
+            <input type="text" id="collectionType" value="Plastic" readonly />
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>4 · Specifica imballo / bancale <span class="auto">(auto)</span></h2>
+        <div class="grid">
+          <label>Peso oggetto (g)
+            <input type="number" id="pesoOggetto" value="20" min="0" step="0.1" />
+          </label>
+          <label>Pezzi per scatola
+            <input type="number" id="pezziScatola" value="240" min="1" />
+          </label>
+          <label>Pezzi totali (per pallet)
+            <input type="number" id="pezziTotali" value="2160" min="1" />
+          </label>
+        </div>
+        <div class="grid calc">
+          <div><strong>Peso netto scatola:</strong> <span id="pesoNettoScatola">—</span></div>
+          <div><strong>Peso lordo scatola:</strong> <span id="pesoLordoscatola">—</span></div>
+          <div><strong>Scatole / pallet:</strong> <span id="scatolePallet">—</span></div>
+          <div><strong>Peso netto pallet:</strong> <span id="pesoNettoPallet">—</span></div>
+          <div><strong>Peso lordo pallet:</strong> <span id="pesoLordopallet">—</span></div>
+        </div>
+        <div class="grid">
+          <label>Disposizione bancale
+            <select id="disposizioneBancale">
+              <option value="std1">Standard 1 – 3 strati × 3 scatole</option>
+              <option value="std2">Standard 2 – 4 strati × 2 scatole</option>
+              <option value="std3">Standard 3 – 2 strati × 5 scatole</option>
+              <option value="forn">Da fornitore (vetro/accessori)</option>
+            </select>
+          </label>
+          <label>Scatole per strato
+            <input type="number" id="scatoleStrato" value="3" min="1" />
+          </label>
+          <label>Strati per pallet
+            <input type="number" id="stratiPallet" value="3" min="1" />
+          </label>
+          <label>Altezza pallet (mm)
+            <input type="number" id="altezzaPallet" value="114" min="0" step="1" />
+          </label>
+        </div>
+        <div class="grid">
+          <label class="full">Nota bancale 1
+            <input type="text" id="notaBancale1" value="Items are packed inside a plastic bag and then inside the carton box" />
+          </label>
+          <label class="full">Nota bancale 2
+            <input type="text" id="notaBancale2" value="Items are aligned" />
+          </label>
+          <label class="full">Nota bancale 3
+            <input type="text" id="notaBancale3" value="Pallet with plastic shrink" />
+          </label>
+        </div>
+        <p class="hint">Primo e terzo campo fissi per lo standard selezionato; gli altri aggiornabili. I motori di calcolo replicano il tuo foglio Excel.</p>
+      </section>
+
+      <section>
+        <h2>5 · Disegni</h2>
+        <div class="grid">
+          <label>Disegno bancale
+            <select id="disegnoBancale">
+              <option value="pallet_std1_dwg">bancale_std1.dwg</option>
+              <option value="pallet_std2_dwg">bancale_std2.dwg</option>
+              <option value="pallet_std3_dwg">bancale_std3.dwg</option>
+              <option value="pallet_forn_dwg">bancale_fornitore.dwg</option>
+            </select>
+          </label>
+          <label>Disegno tecnico pezzo
+            <input type="text" id="disegnoPezzo" value="FC150.0469_dwg.dwg" />
+          </label>
+          <label class="file-field full">Carica disegno bancale (JPG/PNG)
+            <input type="file" id="caricaBancale" accept="image/*" />
+            <span class="file-name" id="bancaleFileName">nessun file caricato</span>
+            <img class="thumb" id="bancalePreview" alt="Anteprima bancale" hidden />
+          </label>
+          <label class="file-field full">Carica disegno tecnico pezzo (immagine o PDF)
+            <input type="file" id="caricaPezzo" accept="image/*,.pdf,application/pdf" />
+            <span class="file-name" id="pezzoFileName">nessun file caricato</span>
+          </label>
+        </div>
+        <p class="hint">I file caricati vengono incorporati nella TDS (pag. 6 disegno bancale, pag. 7 disegno pezzo). In assenza di caricamento si usano i campioni inclusi. Il recupero automatico dal server aziendale è rimandato a una fase successiva.</p>
+      </section>
+
+      <div class="actions">
+        <button type="submit" id="generaBtn">Genera PDF</button>
+      </div>
+      <p id="status"></p>
+    </form>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Technical Data Sheet – anteprima di stampa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400;0,700;1,400&family=Carlito:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Replica strutturale del layout TDS Vetronaviglio (Word + Excel)     */
+  /* 7 pagine A4, header + footer aziendale, tabelle materiali/etichetta */
+  /* ------------------------------------------------------------------ */
+  @page { size: A4; margin: 0; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: "Carlito", "Calibri", "Arimo", "Arial", sans-serif;
+    color: #111; background: #fff;
+  }
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    padding: 12mm 20mm 23mm;
+    page-break-after: always;
+    overflow: hidden;
+    background: #fff;
+  }
+  .page.last { page-break-after: auto; }
+
+  /* ------------ header (tutte le pagine) ---------------------------- */
+  .tds-header {
+    display: flex; align-items: stretch;
+    height: 30mm; margin-bottom: 6mm;
+    border: 1px solid #000;
+  }
+  .tds-header .logo {
+    flex: 2; display: flex; align-items: center; justify-content: center;
+    border-right: 1px solid #000;
+    padding: 1mm;
+  }
+  .tds-header .logo img { width: 100%; height: 100%; object-fit: contain; }
+  .tds-header .title {
+    flex: 3; display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 0 2mm;
+    font-family: "Arimo", "Arial", "Liberation Sans", sans-serif;
+    font-weight: 700; font-size: 22pt; line-height: 1.05;
+    border-right: 1px solid #000;
+  }
+  .tds-header .rev {
+    flex: 2; display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 0 2mm;
+    font-size: 12pt;
+  }
+
+  /* ------------ footer aziendale (tutte tranne pag. 6) -------------- */
+  .tds-footer {
+    position: absolute; bottom: 3mm; left: 20mm; right: 20mm;
+    text-align: center; line-height: 1.2;
+  }
+  .tds-footer img { width: 100%; height: auto; display: block; }
+  .tds-footer .pag { margin-top: 1mm; font-size: 9pt; text-align: left; }
+  /* pag. 6: senza immagine (solo "Pag. x/7", come nell'originale) */
+  .tds-footer.plain { border: none; padding: 0; }
+
+  /* ------------ tipografia contenuti -------------------------------- */
+  .sec-h { font-weight: 700; font-size: 11pt; margin: 2mm 0 3mm; }
+  .sec-h.xl { font-size: 16pt; }
+  .just { text-align: justify; }
+  p.body { font-size: 10.5pt; line-height: 1.4; margin-bottom: 2.5mm; }
+  p.stmt-t { font-weight: 700; font-size: 10.5pt; margin: 4mm 0 1mm; }
+  p.stmt-b { text-align: justify; font-size: 10.5pt; line-height: 1.4; margin-bottom: 2mm; }
+  .omit {
+    color: #d9480f; font-style: italic; font-size: 10pt;
+    margin: 4mm 0; border-left: 3px solid #d9480f; padding-left: 3mm;
+  }
+  ul.bul { list-style: none; font-size: 10.5pt; line-height: 1.45; margin-bottom: 2mm; }
+  ul.bul li::before { content: "•  "; }
+
+  /* ------------ tabelle --------------------------------------------- */
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 10pt; }
+  table.tbl th, table.tbl td { border: 0.4pt solid #555; padding: 1.6mm 2mm; }
+  table.tbl th { font-family: "Arimo", "Arial", "Liberation Sans", sans-serif; font-size: 9pt; font-weight: 700; }
+  table.tbl td { text-align: left; vertical-align: middle; }
+  table.tbl .num { text-align: center; }
+
+  /* TOC pagina 1 */
+  .toc { width: 100%; border-collapse: collapse; margin: 2mm 0 8mm; }
+  .toc td { font-size: 11pt; font-weight: 700; padding: 1.1mm 0; }
+  .toc .lbl { white-space: nowrap; }
+  .toc .dot { width: 100%; }
+  .toc .dot svg, .toc .dot span { display: block; }
+  .toc .pg { white-space: nowrap; }
+
+  /* schema etichettatura 1-C */
+  table.coding { width: 100%; margin-top: 2mm; table-layout: fixed; }
+  table.coding th, table.coding td { width: 50%; text-align: center; }
+
+  /* pagina 6 imballo */
+  .pack-table { width: 100%; margin-top: 2mm; }
+  .pack-table table { width: 100%; border-collapse: collapse; }
+  .pack-table th, .pack-table td { border: 0.4pt solid #555; padding: 2mm; vertical-align: top; }
+  .pack-table th { font-family: "Arimo", "Arial", "Liberation Sans", sans-serif; font-size: 10.5pt; font-weight: 700; text-align: center; }
+  .pack-table th.col-left, .pack-table td.col-left { width: 90mm; }
+  .pack-table .rows { font-size: 10pt; line-height: 1.75; }
+  .pack-table .rows .r { display: flex; }
+  .pack-table .rows .k { width: 62mm; }
+  .pack-table .rows .v { font-weight: 700; }
+  .pack-table td.dwg-cell { text-align: center; }
+  .pack-notes { margin-top: 3mm; }
+  .pack-notes p { font-size: 10.5pt; margin-bottom: 1mm; }
+  .drawing-box {
+    margin-top: 2mm; height: 92mm;
+    border: 1px solid #666; background: #fbfbfb;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9.5pt; color: #666; text-align: center;
+  }
+  .drawing-box img.fit { width: 100%; height: 100%; object-fit: contain; padding: 2mm; }
+
+  /* pagina 7 disegno tecnico (full page, come da file CAD fornito) */
+  .cad-full {
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cad-full img { width: 100%; height: 100%; object-fit: contain; }
+  .cad-full embed { width: 100%; height: 100%; border: 0; }
+  .cad-placeholder {
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11pt; color: #666; text-align: center;
+  }
+
+  /* barra comandi (non stampata) */
+  .toolbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; gap: 10px; align-items: center;
+    background: #0053a5; color: #fff;
+    padding: 8px 16px; font-family: system-ui, sans-serif; font-size: 13px;
+  }
+  .toolbar button {
+    border: 0; border-radius: 6px; padding: 7px 14px;
+    font-weight: 700; cursor: pointer; font-size: 13px;
+  }
+  .toolbar button.primary { background: #ff6b00; color: #fff; }
+  .toolbar button.ghost { background: rgba(255,255,255,.15); color: #fff; }
+  .toolbar .spacer { flex: 1; }
+  @media print {
+    .toolbar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <strong>TDS – anteprima</strong>
+  <span class="spacer"></span>
+  <span id="toolbarInfo"></span>
+  <button type="button" class="primary" id="printBtn" onclick="window.print()">Esporta PDF / Stampa</button>
+  <button type="button" class="ghost" onclick="window.close()">Chiudi</button>
+</div>
+
+<!-- ================= PAG. 1 : SUMMARY ================= -->
+<section class="page" id="page1">
+  <header class="tds-header">
+    <div class="logo"><img src="assets/logo-small.png" alt="Vetronaviglio" /></div>
+    <div class="title">TECHNICAL DATA<br />SHEET</div>
+    <div class="rev" id="pRev1"></div>
+  </header>
+
+  <p class="body" style="text-align:right;" id="pBareggio1"></p>
+
+  <div class="sec-h xl">SUMMARY</div>
+
+  <table class="toc">
+    <tbody>
+      <tr><td class="lbl">1.</td><td class="lbl">MATERIAL &amp; COMPLIANCE SHEET</td><td class="dot"></td><td class="pg">Pag. 2</td></tr>
+      <tr style="height:2mm;"><td></td></tr>
+      <tr><td></td><td class="lbl">1-A APPLICABLE REGULATIONS</td><td class="dot"></td><td class="pg">Pag. 3</td></tr>
+      <tr><td></td><td class="lbl">1-B DISCLAIMER</td><td class="dot"></td><td class="pg">Pag. 4</td></tr>
+      <tr><td></td><td class="lbl">1-C LABELLING</td><td class="dot"></td><td class="pg">Pag. 5</td></tr>
+      <tr><td></td><td class="lbl">2. PACKING SPECIFICATION</td><td class="dot"></td><td class="pg">Pag. 6</td></tr>
+      <tr><td></td><td class="lbl">3. TECHNICAL DRAWING as attached</td><td class="dot"></td><td class="pg">Pag. 7</td></tr>
+    </tbody>
+  </table>
+
+  <table class="tbl" id="revTable" style="margin-top:6mm;">
+    <thead>
+      <tr><th style="width:34mm;">Date</th><th style="width:18mm;">Rev.</th><th>Revision Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>11/01/2021</td><td class="num">0</td><td>Issue of the document</td></tr>
+      <tr><td>01/02/2021</td><td class="num">1</td><td>Deleted Doc. NR</td></tr>
+      <tr><td>26/08/2021</td><td class="num">2</td><td>Labeling information added</td></tr>
+      <tr><td>07/09/2021</td><td class="num">3</td><td>Review of Technical Data Sheet</td></tr>
+      <tr><td id="revDateCell"></td><td class="num" id="revNumCell"></td><td id="revPkCell">Certification logos added</td></tr>
+    </tbody>
+  </table>
+
+  <footer class="tds-footer">
+    <img src="assets/coda.png" alt="Vetronaviglio - piè di pagina" />
+    <div class="pag">Pag. 1/7</div>
+  </footer>
+</section>
+
+<!-- ================= PAG. 2 : MATERIAL & COMPLIANCE ================= -->
+<section class="page" id="page2">
+  <header class="tds-header">
+    <div class="logo"><img src="assets/logo-small.png" alt="Vetronaviglio" /></div>
+    <div class="title">TECHNICAL DATA<br />SHEET</div>
+    <div class="rev" id="pRev2"></div>
+  </header>
+
+  <div class="sec-h">1. MATERIAL &amp; COMPLIANCE SHEET</div>
+
+  <p class="body">The list of materials used for the manufacturing of the product included in your project is as below:</p>
+
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th style="width:50mm;">PRODUCT DESCRIPTION</th>
+        <th style="width:34mm;">PRODUCT CODE</th>
+        <th>MATERIALS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td id="mDesc" style="white-space:pre-line;"></td>
+        <td id="mCode" class="num"></td>
+        <td id="mMat">- HIGH DENSITY POLYETHYLENE<br />- COLOUR MASTERBATCH<br />- INK / UVGL</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <footer class="tds-footer">
+    <img src="assets/coda.png" alt="Vetronaviglio - piè di pagina" />
+    <div class="pag">Pag. 2/7</div>
+  </footer>
+</section>
+
+<!-- ================= PAG. 3 : 1-A APPLICABLE REGULATIONS ================= -->
+<section class="page" id="page3">
+  <header class="tds-header">
+    <div class="logo"><img src="assets/logo-small.png" alt="Vetronaviglio" /></div>
+    <div class="title">TECHNICAL DATA<br />SHEET</div>
+    <div class="rev" id="pRev3"></div>
+  </header>
+
+  <div class="sec-h">1-A APPLICABLE REGULATIONS</div>
+
+  <p class="stmt-t">Statement of compliance with Regulation (EC) N.1907/2006 (REACH)</p>
+  <p class="stmt-b">With specific reference to Regulation (EC) N.1907/2006 and further amendments (REACH), art. 3(3), cosmetic packagings produced by Vetronaviglio S.r.l. are considered &ldquo;articles&rdquo;. Therefore, with specific reference to REACH art. 33, we hereby declare that none of the products listed in the chart above contains any substance included in REACH Annex XIV, as defined by REACH art. 57, or included in the &ldquo;Candidate list&rdquo; published by ECHA (Substances of Very High Concern - SVHC), in concentration exceeding 0.1% (weight/weight), as defined by REACH art. 59 (1), and in conformity to REACH art. 59 (10). Please note that, in accordance to both the Regulation (EC) N.1907/2006 (REACH) and the Regulation (EC) N.1272/2008 (CLP), Vetronaviglio S.r.l. is not a supplier of substances nor preparations, and is therefore not required to send MSDSs to their customers.</p>
+
+  <p class="stmt-t">Statement of compliance with European Parliament and Council Directive N.94/62/EC</p>
+  <p class="stmt-b">We hereby declare that our products meet the requirements stated by European Directive 94/62/EC &ldquo;on packaging and packaging waste&rdquo;, including further amendments. In particular, the levels of heavy metals in our products are within the range of 100 ppm (w/w), in compliance to Dir. 94/62/EC art. 11.</p>
+
+  <p class="stmt-t">Statement of compliance according to CE Cosmetics Regulation N.1223/2009</p>
+  <p class="stmt-b">Vetronaviglio S.r.l. confirms that the above articles and/or components do not contain substances listed in Annex II (banned substances) and Annex III (under restriction substances) of CE Cosmetics Regulation N. 1223/2009. The materials used do not contain significant impurities, and, to our knowledge, our products do not present phenomena of migration of chemicals when they come into contact with their contents. However, we recommend our customers to perform the tests which apply to their formulations.</p>
+
+  <p class="stmt-t">Statement of compliance to GMPs (Regulation N.2023/2006/EC)</p>
+  <p class="stmt-b">Vetronaviglio S.r.l. confirms that the above articles and/or components are manufactured in compliance with good manufacturing practices (GMP). Such GMPs are those described by the CE Regulation N.2023/2006 for food packaging, which comprises a quality assurance and control system, dedicated process design and equipment, documentation and appropriate qualification of staff. Vetronaviglio S.r.l. applies these GMPs to all stages of manufacturing, processing and distribution of its products.</p>
+
+  <div id="stmt5"></div>
+
+  <footer class="tds-footer">
+    <img src="assets/coda.png" alt="Vetronaviglio - piè di pagina" />
+    <div class="pag">Pag. 3/7</div>
+  </footer>
+</section>
+
+<!-- ================= PAG. 4 : 1-B DISCLAIMER ================= -->
+<section class="page" id="page4">
+  <header class="tds-header">
+    <div class="logo"><img src="assets/logo-small.png" alt="Vetronaviglio" /></div>
+    <div class="title">TECHNICAL DATA<br />SHEET</div>
+    <div class="rev" id="pRev4"></div>
+  </header>
+
+  <div class="sec-h">1-B DISCLAIMER</div>
+
+  <p class="body just">According to the declarations of our suppliers, the raw materials we use are fully compliant with the above Regulations and Directives. We do not introduce any of the substances listed in the Regulations and Directives referenced above in our production processes. Vetronaviglio S.r.l. makes no warranties which extend beyond the information contained herein.</p>
+
+  <div style="text-align:right; margin-top:18mm; line-height:1.9; font-size:10.5pt;">
+    <div>Vetronaviglio S.r.l.</div>
+    <div>Quality Assurance Manager</div>
+    <div style="font-weight:700;">Federico Rosi</div>
+  </div>
+
+  <footer class="tds-footer">
+    <img src="assets/coda.png" alt="Vetronaviglio - piè di pagina" />
+    <div class="pag">Pag. 4/7</div>
+  </footer>
+</section>
+
+<!-- ================= PAG. 5 : 1-C LABELLING ================= -->
+<section class="page" id="page5">
+  <header class="tds-header">
+    <div class="logo"><img src="assets/logo-small.png" alt="Vetronaviglio" /></div>
+    <div class="title">TECHNICAL DATA<br />SHEET</div>
+    <div class="rev" id="pRev5"></div>
+  </header>
+
+  <div class="sec-h">1-C LABELLING (Applicable for Italy)</div>
+
+  <p class="body just">The Legislative Decree of 3 September 2020 makes labelling mandatory. According to the Annexes of Decision 129/97/CE, the information on the label is:</p>
+  <ul class="bul">
+    <li>Alphanumeric Coding</li>
+    <li>Family of material</li>
+    <li>Collection information</li>
+  </ul>
+  <p class="body">This information changes for plastic, glass, wood, paper, aluminium packaging.</p>
+  <p class="body">For coding of materials to be reported on packaging, see the guidelines at the following link:</p>
+  <p class="body" style="font-weight:700;"><a id="conaiLink" href="https://www.etichetta-conai.com/documenti/linee-guida/" target="_blank" style="color:#0000EE;text-decoration:underline;">https://www.etichetta-conai.com/documenti/linee-guida/</a></p>
+  <p class="body">For this product, the pack coding is as follows:</p>
+
+  <table class="tbl coding">
+    <thead>
+      <tr><th>Pack Coding</th><th>Collection type</th></tr>
+    </thead>
+    <tbody>
+      <tr><td id="lPack"></td><td id="lColl"></td></tr>
+    </tbody>
+  </table>
+
+  <footer class="tds-footer">
+    <img src="assets/coda.png" alt="Vetronaviglio - piè di pagina" />
+    <div class="pag">Pag. 5/7</div>
+  </footer>
+</section>
+
+<!-- ================= PAG. 6 : PACKING SPECIFICATION (no footer aziendale) ================= -->
+<section class="page" id="page6">
+  <header class="tds-header">
+    <div class="logo"><img src="assets/logo-small.png" alt="Vetronaviglio" /></div>
+    <div class="title">TECHNICAL DATA<br />SHEET</div>
+    <div class="rev" id="pRev6"></div>
+  </header>
+
+  <div class="sec-h">2. PACKING SPECIFICATION</div>
+
+  <p class="body" style="margin-bottom:3mm;"><strong>ITEM DESCRIPTION:</strong> <span id="vItem"></span></p>
+
+  <div class="pack-table">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-left">PALLET COMPOSITION:</th>
+          <th>PALLET DRAWING:</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-left">
+            <div class="rows">
+              <div class="r"><span class="k">Item weight</span><span class="v" id="vItemWeight"></span></div>
+              <div class="r"><span class="k">Box net weight</span><span class="v" id="vBoxNet"></span></div>
+              <div class="r"><span class="k">Box gross weight</span><span class="v" id="vBoxGross"></span></div>
+              <div class="r"><span class="k">Net weight pallet (approx.)</span><span class="v" id="vPalNet"></span></div>
+              <div class="r"><span class="k">Gross weight pallet (approx.)</span><span class="v" id="vPalGross"></span></div>
+              <div class="r"><span class="k">Total pieces per box</span><span class="v" id="vPzBox"></span></div>
+              <div class="r"><span class="k">Boxes per layers</span><span class="v" id="vBoxLayer"></span></div>
+              <div class="r"><span class="k">Total layers per pallet</span><span class="v" id="vLayers"></span></div>
+              <div class="r"><span class="k">Total boxes per pallet</span><span class="v" id="vBoxPal"></span></div>
+              <div class="r"><span class="k">Total pieces per pallet</span><span class="v" id="vPzPal"></span></div>
+              <div class="r"><span class="k">Pallet type</span><span class="v" id="vPalType"></span></div>
+              <div class="r"><span class="k">Pallet height</span><span class="v" id="vPalHeight"></span></div>
+            </div>
+          </td>
+          <td class="dwg-cell">
+            <div class="drawing-box" id="vPalDwg"></div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pack-notes">
+    <p><strong>Pallet composition notes:</strong></p>
+    <ul class="bul" id="vNotes"></ul>
+  </div>
+
+  <footer class="tds-footer plain" style="text-align:center;">
+    <div class="pag">Pag. 6/7</div>
+  </footer>
+</section>
+
+<!-- ================= PAG. 7 : TECHNICAL DRAWING ================= -->
+<section class="page last" id="page7">
+  <div class="cad-full" id="vPezzoDwg" hidden></div>
+  <div class="cad-placeholder" id="vDwgPlaceholder">
+    [ disegno tecnico pezzo ]<br /><span id="vDwgName"></span>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var state = null;
+  try { state = JSON.parse(localStorage.getItem("tds_state") || "null"); } catch (e) {}
+
+  function fmt(v, suffix) {
+    if (v === null || v === undefined || v === "") return "—";
+    return String(v) + (suffix || "");
+  }
+  function numIt(n) { return (Math.round(n * 100) / 100).toString().replace(".", ","); }
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    var p = String(iso).split("-");
+    return p.length === 3 ? (p[2] + "/" + p[1] + "/" + p[0]) : iso;
+  }
+  function $(id) { return document.getElementById(id); }
+
+  var rev = state ? "Rev. " + state.revisione + " del " + fmtDate(state.dataCreazione) : "";
+  for (var i = 1; i <= 7; i++) { var elR = $("pRev" + i); if (elR) elR.textContent = rev; }
+
+  var usage = state ? "Campione: " + state.codiceArticolo : "Anteprima vuota";
+  $("toolbarInfo").textContent = usage;
+
+  if (!state) return;
+
+  // PAG 1
+  $("pBareggio1").textContent = "Bareggio, " + fmtDate(state.dataCreazione);
+  $("revDateCell").textContent = fmtDate(state.dataCreazione);
+  $("revNumCell").textContent = state.revisione;
+
+  // PAG 2
+  $("mDesc").textContent = state.nomeArticolo;
+  $("mCode").textContent = state.codiceArticolo;
+  $("mMat").innerHTML = (state.materiali || []).map(function (m) { return "- " + m; }).join("<br />");
+
+  // PAG 3
+  if (state.pcr) {
+    $("stmt5").innerHTML = '<p class="omit">[PARAGRAFO FOOD CONTACT OMESSO – materiale PCR]</p>';
+  } else {
+    $("stmt5").innerHTML =
+      '<p class="stmt-t">Statement of compliance to Regulations and Directives on materials and articles intended to come into contact with food (Regulation (EC) N.1935/2004 and Regulation (EC) N.10/2011)</p>' +
+      '<p class="stmt-b">Vetronaviglio S.r.l. confirms that the raw materials used for the production of the above articles and/or components are in compliance with Regulation (EC) N.1935/2004 and Regulation (EC) N.10/2011.</p>';
+  }
+
+  // PAG 5
+  $("lPack").textContent = state.packCoding;
+  $("lColl").textContent = state.collectionType;
+
+  // PAG 6
+  $("vItem").textContent = state.nomeArticolo;
+  $("vItemWeight").textContent = fmt(numIt(state.pesoOggetto), " g");
+  $("vBoxNet").textContent = fmt(numIt(state.pesoNettoScatola), " Kg");
+  $("vBoxGross").textContent = fmt(numIt(state.pesoLordoscatola), " Kg");
+  $("vPalNet").textContent = fmt(numIt(state.pesoNettoPallet), " Kg");
+  $("vPalGross").textContent = fmt(numIt(state.pesoLordopallet), " Kg");
+  $("vPzBox").textContent = state.pezziScatola;
+  $("vBoxLayer").textContent = state.scatoleStrato;
+  $("vLayers").textContent = state.strati;
+  $("vBoxPal").textContent = state.scatolePallet;
+  $("vPzPal").textContent = state.pezziTotali;
+  $("vPalType").textContent = state.palletType || "Fumigated EPAL (1200*800 mm)";
+  $("vPalHeight").textContent = fmt(state.palletHeight, " mm");
+  $("vPalDwg").innerHTML = '<img class="fit" src="' + (state.bancaleImg || "assets/bancale-bx01-0005-3.jpg") + '" alt="disegno bancale" />';
+  $("vNotes").innerHTML = (state.noteBancale || []).map(function (n) { return "<li>" + n + "</li>"; }).join("");
+
+  // PAG 7 — disegno tecnico pezzo.
+  // Se il sorgente è un PDF (upload o asset) viene rasterizzato in PNG con
+  // pdf.js prima della stampa: l'<embed> di PDF in Chromium genera una pagina
+  // bianca aggiuntiva in fondo quando si stampa. Flusso: attesa rasterizzazione
+  // -> sostituzione con <img> -> abilita pulsante Esporta.
+  var pezzoSrc = state.pezzoImg || "assets/pl-kappa-150ml.pdf";
+  var vDwg = $("vPezzoDwg");
+  var printBtn = $("printBtn");
+  var tInfo = $("toolbarInfo");
+  var isPdfFile = /(^data:application\/pdf)|\.pdf($|\?)/i.test(pezzoSrc);
+
+  function tdsShowImg(dataUrl) {
+    vDwg.innerHTML = '<img src="' + dataUrl + '" alt="disegno tecnico pezzo" />';
+    vDwg.hidden = false;
+    $("vDwgPlaceholder").style.display = "none";
+  }
+  function tdsShowEmbed() {
+    vDwg.innerHTML = '<embed src="' + pezzoSrc + '" type="application/pdf" />';
+    vDwg.hidden = false;
+    $("vDwgPlaceholder").style.display = "none";
+  }
+
+  $("vDwgName").textContent = state.disegnoPezzo || "";
+
+  if (!isPdfFile) {
+    tdsShowImg(pezzoSrc);
+  } else if (window.pdfjsLib) {
+    printBtn.disabled = true;
+    tInfo.textContent = usage + " · caricamento disegno…";
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    fetch(pezzoSrc)
+      .then(function (r) { return r.arrayBuffer(); })
+      .then(function (buf) { return pdfjsLib.getDocument({ data: buf }).promise; })
+      .then(function (doc) { return doc.getPage(1); })
+      .then(function (pg) {
+        var vp = pg.getViewport({ scale: 2 });
+        var canvas = document.createElement("canvas");
+        canvas.width = vp.width;
+        canvas.height = vp.height;
+        return pg.render({
+          canvasContext: canvas.getContext("2d"),
+          viewport: vp
+        }).promise.then(function () { return canvas.toDataURL("image/png"); });
+      })
+      .then(function (dataUrl) {
+        tdsShowImg(dataUrl);
+        tInfo.textContent = usage;
+        printBtn.disabled = false;
+      })
+      .catch(function (err) {
+        tdsShowEmbed();
+        tInfo.textContent = usage + " · avviso: disegno rasterizzato non disponibile, usato embed";
+        printBtn.disabled = false;
+        console.warn("rasterizzazione CAD fallita, usato embed", err);
+      });
+  } else {
+    tdsShowEmbed();
+  }
+
+  })();
+</script>
+</body>
+</html>
