@@ -124,11 +124,15 @@
     display: flex; align-items: center; justify-content: center;
   }
   .cad-full img { width: 100%; height: 100%; object-fit: contain; }
-  .cad-full embed { width: 100%; height: 100%; border: 0; }
   .cad-placeholder {
     position: absolute; left: 0; right: 0; top: 0; bottom: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11pt; color: #666; text-align: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 11pt; color: #666; text-align: center; padding: 8mm;
+  }
+  .cad-placeholder .cad-fail {
+    margin-top: 4mm; font-size: 9.5pt; color: #b58900;
+    border: 1px dashed #d5b45b; background: #fdf6e3;
+    padding: 3mm 4mm; max-width: 150mm; line-height: 1.45;
   }
 
   /* barra comandi (non stampata) */
@@ -399,6 +403,7 @@
   <div class="cad-full" id="vPezzoDwg" hidden></div>
   <div class="cad-placeholder" id="vDwgPlaceholder">
     [ disegno tecnico pezzo ]<br /><span id="vDwgName"></span>
+    <div class="cad-fail" id="vDwgFail" style="display:none"></div>
   </div>
 </section>
 
@@ -498,6 +503,8 @@
   // pdf.js prima della stampa: l'<embed> di PDF in Chromium genera una pagina
   // bianca aggiuntiva in fondo quando si stampa. Flusso: attesa rasterizzazione
   // -> sostituzione con <img> -> abilita pulsante Esporta.
+  // Il fallback NON usa mai <embed> (rompe la stampa): mostra un placeholder
+  // chiaro e mantiene sempre 7 pagine A4 nell'output.
   var pezzoSrc = state.pezzoImg || "assets/pl-kappa-150ml.pdf";
   var vDwg = $("vPezzoDwg");
   var printBtn = $("printBtn");
@@ -509,10 +516,14 @@
     vDwg.hidden = false;
     $("vDwgPlaceholder").style.display = "none";
   }
-  function tdsShowEmbed() {
-    vDwg.innerHTML = '<embed src="' + pezzoSrc + '" type="application/pdf" />';
-    vDwg.hidden = false;
-    $("vDwgPlaceholder").style.display = "none";
+  function tdsShowPlaceholder(msg) {
+    vDwg.innerHTML = "";
+    vDwg.hidden = true;
+    $("vDwgPlaceholder").style.display = "flex";
+    var fail = $("vDwgFail");
+    fail.textContent = msg || "";
+    fail.style.display = msg ? "block" : "none";
+    printBtn.disabled = false;
   }
 
   $("vDwgName").textContent = state.disegnoPezzo || "";
@@ -521,6 +532,13 @@
     tdsShowImg(pezzoSrc);
   } else if (window.pdfjsLib) {
     printBtn.disabled = true;
+    var done = false;
+    var tdsTimer = setTimeout(function () {
+      if (done) return;
+      tdsShowPlaceholder("Il disegno CAD non è stato caricato entro il tempo massimo. " +
+        "Rigenera il PDF o inserisci nuovamente il disegno, oppure verifica la connessione.");
+      tInfo.textContent = usage + " · avviso: rasterizzazione disegno non completata";
+    }, 20000);
     tInfo.textContent = usage + " · caricamento disegno…";
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -539,18 +557,23 @@
         }).promise.then(function () { return canvas.toDataURL("image/png"); });
       })
       .then(function (dataUrl) {
+        done = true;
+        clearTimeout(tdsTimer);
         tdsShowImg(dataUrl);
         tInfo.textContent = usage;
         printBtn.disabled = false;
       })
       .catch(function (err) {
-        tdsShowEmbed();
-        tInfo.textContent = usage + " · avviso: disegno rasterizzato non disponibile, usato embed";
-        printBtn.disabled = false;
-        console.warn("rasterizzazione CAD fallita, usato embed", err);
+        done = true;
+        clearTimeout(tdsTimer);
+        tdsShowPlaceholder("Il disegno CAD non è stato rasterizzato (" + (err.message || err) +
+          "). Inserisci di nuovo il disegno o usa un'immagine (JPG/PNG).");
+        tInfo.textContent = usage + " · avviso: disegno non disponibile";
+        console.warn("rasterizzazione CAD fallita", err);
       });
   } else {
-    tdsShowEmbed();
+    tdsShowPlaceholder("Questo browser non supporta la rasterizzazione del disegno CAD. " +
+      "Apri la pagina con Chrome/Edge oppure carica il disegno come immagine (JPG/PNG).");
   }
 
   })();
