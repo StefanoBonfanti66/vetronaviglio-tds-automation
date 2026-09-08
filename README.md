@@ -6,7 +6,11 @@
 
 ## Indice
 - `docs/questionario-tds-chiara.md` – domande per Chiara (raccolta dati menù/tendenze)
-- `docs/brief-tds-poc.md` – brief tecnico del POC
+- `docs/brief-tds-poc.md` – brief tecnico del POC (aggiornato con le risposte di Chiara)
+- `docs/QCO30.0389_TDS.pdf` – esempio TDS vetro (composizione ossidi a pag. 2)
+- `docs/Esempio TDS.pdf` – esempio TDS plastica (KAPPA)
+- `docs/Calcolatore automatico pallettizzazione 2.0.xlsx` – regole calcolo bancale
+- `docs/` – allegati Chiara (disegni bancale JPG, PL-KAPPA, brief, questionario)
 - `./` (root) – sito statico (GitHub Pages) con il form di generazione TDS
   (`index.html`, `print.html`, `app.js`, `data.js`, `style.css`, `assets/`)
 
@@ -34,7 +38,12 @@ branch `main`) — essendo statico nessun backend richiesto.
   la riga vetro nella tabella materiali; pack coding `GL 70` proposto automaticamente
 - **Etichettatura automatica**: `determinePackCoding()` suggerisce Pack Coding + Collection
   type dalla composizione (GL 70, HDPE 2, LDPE 4, PP 5, C/PP 92, C/PP 95, K-RESIN)
-- Calcolo automatico bancale da: peso oggetto, pezzi/scatola, pezzi totali
+- **Composizione vetro** condizionale: tabella ossidi (default Flint Glass da
+  `QC030.0389_TDS.pdf`), renderizzata a pag. 2 della TDS
+- Calcolo bancale allineato al foglio Excel di Chiara (`docs/Calcolatore automatico
+  pallettizzazione 2.0.xlsx`): input peso oggetto, pezzi/scatola, scatole/strato,
+  strati/pallet; derivati scatole/pallet, pezzi/pallet, pesi netto/lordo (cartone +0,5 Kg,
+  pallet EPAL +25 Kg)
 - Note bancale fisse (plastic bag, plastic shrink) + **note variabili** a checkbox
   (neck down jar, plastic film, 2 ply centre plate, side edge angle board)
 - Selettore disegno bancale (3 standard + fornitori) e pulsanti **Sfoglia** per caricare
