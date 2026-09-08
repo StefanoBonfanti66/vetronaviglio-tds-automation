@@ -306,7 +306,7 @@
         status.textContent = "File troppo pesanti per l'anteprima (limite localStorage). Usa disegni più leggeri (JPG/PNG) oppure non caricarli.";
         return;
       }
-      window.open("print.html?v=3", "_blank");
+      window.open("print.html?v=4", "_blank");
       status.innerHTML = `✅ Anteprima aperta: seleziona <strong>"Salva come PDF"</strong> nel dialogo di stampa
         (Margini: <strong>Nessuno</strong>) per generare <strong>TDS_${slug(payload.codiceArticolo)}.pdf</strong>.`;
     } catch (err) {
