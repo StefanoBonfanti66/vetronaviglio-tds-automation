@@ -232,6 +232,16 @@
     </tbody>
   </table>
 
+  <div id="glassCompBlock" hidden>
+    <p class="stmt-t">Glass chemical composition (<span id="gTypeLabel"></span>) (% w/w)</p>
+    <table class="tbl glass-comp">
+      <thead>
+        <tr><th style="width:60mm;">Component</th><th>Min (% w/w)</th><th>Max (% w/w)</th></tr>
+      </thead>
+      <tbody id="glassCompPrintBody"></tbody>
+    </table>
+  </div>
+
   <footer class="tds-footer">
     <img src="assets/coda.png" alt="Vetronaviglio - piè di pagina" />
     <div class="pag">Pag. 2/7</div>
@@ -427,7 +437,31 @@
   // PAG 2
   $("mDesc").textContent = state.nomeArticolo;
   $("mCode").textContent = state.codiceArticolo;
-  $("mMat").innerHTML = (state.materiali || []).map(function (m) { return "- " + m; }).join("<br />");
+  var matHtml = (state.materiali || []).map(function (m) { return "- " + m; }).join("<br />");
+  // Se è presente vetro, aggiungi riga composizione vetro
+  if (state.isGlass) {
+    var gt = state.glassType || "Flint Glass";
+    var gc = state.glassComposition || "";
+    matHtml += "<br /><em>[VETRO] " + gt;
+    if (gc) matHtml += " – " + gc;
+    matHtml += "</em>";
+  }
+  $("mMat").innerHTML = matHtml;
+
+  // Tabella composizione chimica vetro (solo se vetro + righe presenti)
+  var gcBody = $("glassCompPrintBody");
+  var gcBlock = $("glassCompBlock");
+  var hasRows = !!(state.glassCompositionRows && state.glassCompositionRows.length);
+  if (state.isGlass && hasRows) {
+    $("gTypeLabel").textContent = state.glassType || "Flint Glass";
+    gcBody.innerHTML = state.glassCompositionRows.map(function (r) {
+      return "<tr><td>" + r.name + "</td><td class=\"num\">" + r.min + "</td><td class=\"num\">" + r.max + "</td></tr>";
+    }).join("");
+    gcBlock.hidden = false;
+  } else {
+    gcBody.innerHTML = "";
+    gcBlock.hidden = true;
+  }
 
   // PAG 3
   if (state.pcr) {

@@ -7,10 +7,11 @@
 ## Indice
 - `docs/questionario-tds-chiara.md` – domande per Chiara (raccolta dati menù/tendenze)
 - `docs/brief-tds-poc.md` – brief tecnico del POC
-- `app/` – sito statico (GitHub Pages) con il form di generazione TDS
+- `./` (root) – sito statico (GitHub Pages) con il form di generazione TDS
+  (`index.html`, `print.html`, `app.js`, `data.js`, `style.css`, `assets/`)
 
 ## Come girare il POC
-1. Apri `app/index.html` in un browser (oppure `cd app && python3 -m http.server`)
+1. Apri `index.html` in un browser (oppure `python3 -m http.server` dalla root)
 2. Compila il form (nome articolo, codice, materiale, etichettatura, bancale…)
 3. Clicca **Genera PDF** → si apre `print.html`, una replica pagina-per-pagina della TDS
 4. In `print.html` clicca **Esporta PDF / Stampa** → dialogo di stampa → "Salva come PDF"
@@ -20,16 +21,23 @@
 > che riproduce struttura e font (Arimo/Carlito) della TDS Word attuale.
 
 ## Deploy GitHub Pages
-Pubblicare la cartella `app/` da GitHub Pages (root del repo o `/app`) — essendo statico
-nessun backend richiesto.
+Pubblicare la root del repo da GitHub Pages (repo `StefanoBonfanti66/vetronaviglio-tds-automation`,
+branch `main`) — essendo statico nessun backend richiesto.
 
-## Regole implementate nel POC (dai commenti di Chiara)
-- Menù a tendina materiali (da popolare con i dati del questionario)
-- Toggle **PCR** → rimuove il paragrafo food contact con alert
-- Menù etichettatura (Pack Coding → Collection type)
+## Regole implementate nel POC (dalle risposte di Chiara)
+- Catalogo materiali in `data.js` (`MATERIAL_CATALOG`), raggruppato per categoria
+  (Vetro / Plastica / Meccanica), con etichette e ruoli (Meccanismo, Molla, Dispenser e spray)
+- Composizione **multi-materiale**: aggiungi/rimuovi chip per costruire l'elenco materiali
+- **PCR** rilevato automaticamente dalla selezione (PP PCR / PE PCR) → rimuove il paragrafo
+  food contact con alert
+- **Vetro** rilevato automaticamente → mostra la sezione "Composizione vetro" e aggiunge
+  la riga vetro nella tabella materiali; pack coding `GL 70` proposto automaticamente
+- **Etichettatura automatica**: `determinePackCoding()` suggerisce Pack Coding + Collection
+  type dalla composizione (GL 70, HDPE 2, LDPE 4, PP 5, C/PP 92, C/PP 95, K-RESIN)
 - Calcolo automatico bancale da: peso oggetto, pezzi/scatola, pezzi totali
+- Note bancale fisse (plastic bag, plastic shrink) + **note variabili** a checkbox
+  (neck down jar, plastic film, 2 ply centre plate, side edge angle board)
 - Selettore disegno bancale (3 standard + fornitori) e pulsanti **Sfoglia** per caricare
   disegno bancale e disegno pezzo (incorporati nella TDS pag. 6/7; senza upload si usano
-  i campioni in `app/assets/`)
-- Campi fissi vs a tendina nella composizione bancale
+  i campioni in `assets/`)
 - Generazione PDF unico in output

@@ -131,3 +131,133 @@ button:disabled { background: #aab4c0; cursor: not-allowed; }
   border-radius: 8px;
   margin-top: 4px;
 }
+
+/* ── Multi-material composition ─────────────────────────────── */
+.add-material-row {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 6px;
+}
+.btn-add {
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  width: auto;
+  border-radius: 8px;
+  background: var(--ok);
+}
+.btn-add:hover { background: #178044; }
+
+.composition-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 6px;
+}
+.composition-list:empty + #compositionHint { display: block; }
+.composition-list:not(:empty) + #compositionHint { display: none; }
+
+.mat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eaf3ff;
+  border: 1px solid #b6cff2;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--vnav);
+}
+.mat-chip .mat-cat {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 11px;
+}
+.mat-chip .mat-pcr {
+  background: #fef3e2;
+  color: var(--warn);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.mat-chip .mat-glass {
+  background: #e0f0ff;
+  color: #005fa3;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.mat-chip .mat-role {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 11px;
+}
+.mat-chip .remove-mat {
+  background: none;
+  border: none;
+  color: #c53030;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  width: auto;
+  font-weight: 700;
+}
+.mat-chip .remove-mat:hover { color: #9b2c2c; }
+
+/* ── Variable pallet notes ──────────────────────────────────── */
+.variable-notes {
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+}
+.variable-notes-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.variable-notes .checkbox-line {
+  margin-bottom: 6px;
+}
+
+/* ── Glass section indicator ────────────────────────────────── */
+#glassSection {
+  border-left: 3px solid #005fa3;
+  background: #f0f7ff;
+  padding-left: 16px;
+  margin-top: 28px;
+}
+
+/* ── Glass chemical composition table ───────────────────────── */
+table.glass-comp {
+  width: 100%;
+  max-width: 520px;
+  border-collapse: collapse;
+  margin: 10px 0 14px;
+}
+table.glass-comp th,
+table.glass-comp td {
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 13px;
+}
+table.glass-comp th {
+  background: #eef4fa;
+  font-weight: 600;
+  color: var(--muted);
+}
+table.glass-comp input {
+  width: 90px;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 13px;
+}
