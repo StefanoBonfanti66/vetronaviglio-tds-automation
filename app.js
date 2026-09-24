@@ -59,7 +59,9 @@
       }
       const opt = document.createElement("option");
       opt.value = m.id;
-      opt.textContent = m.label + (m.role ? " (" + m.role + ")" : "");
+      let optText = m.label + (m.role ? " (" + m.role + ")" : "");
+      opt.textContent = optText;
+      if (m.tip) { opt.title = m.tip; }
       grp.appendChild(opt);
     });
   }
@@ -108,17 +110,21 @@
   // ------------------------------------------------------------------
   function updateCompositionLogic() {
     const ids = composition;
-    const isPCR = hasPCR(ids);
+    const plasticPCR = hasPlasticPCR(ids);   // plastica PCR → food contact OMESSO
+    const glassPCR = hasGlassPCR(ids);        // vetro PCR → food contact MANTENUTO
     const isGlass = hasGlassMaterial(ids);
 
-    // Food contact
-    $("foodContactAlert").hidden = !isPCR;
+    // Food contact: omesso SOLO per plastica PCR; il vetro PCR lo mantiene
+    $("foodContactAlert").hidden = !plasticPCR;
 
-    // Glass section
+    // Glass section (anche vetro PCR)
     $("glassSection").hidden = !isGlass;
     if (isGlass) {
       $("glassBadge").textContent = "vetro rilevato";
     }
+
+    // Sezione % PCR: vetro fisso 30%, plastica libera (calcolo Excel in fase 2)
+    renderPCRSection();
 
     // Pack coding auto-suggest
     const suggested = determinePackCoding(ids);
@@ -129,6 +135,48 @@
     } else {
       $("packCodingAuto").textContent = "";
     }
+  }
+
+  // ── Sezione % PCR (spec Chiara 2.0): per ogni materiale PCR un campo ──
+  // Vetro PCR: fisso 30% (readonly). Plastica PCR: input libero.
+  function renderPCRSection() {
+    const box = $("pcrBox");
+    if (!box) return;
+    const pcrIds = composition.filter((id) => {
+      const m = findMaterial(id);
+      return m && m.pcr;
+    });
+    if (!pcrIds.length) {
+      box.hidden = true;
+      box.innerHTML = "";
+      return;
+    }
+    box.hidden = false;
+    let html = "<h4>Percentuale materiale riciclato (PCR)</h4><div class='grid'>";
+    pcrIds.forEach((id) => {
+      const m = findMaterial(id);
+      const isGlass = !!m.isGlass;
+      const val = isGlass ? PCR_GLASS_FIXED : "";
+      const ro = isGlass ? " readonly" : "";
+      const note = isGlass ? " (fisso 30%)" : "";
+      html +=
+        '<label class="full">' + m.label + note +
+        '<input type="number" id="pcrPct_' + id + '" min="0" max="100" step="1" value="' + val + '"' + ro + ' /></label>';
+    });
+    html += "</div>";
+    box.innerHTML = html;
+  }
+
+  // Raccoglie le % PCR impostate per ogni materiale PCR
+  function collectPCRPercentages() {
+    const out = {};
+    composition.forEach((id) => {
+      const m = findMaterial(id);
+      if (!m || !m.pcr) return;
+      const inp = $("pcrPct_" + id);
+      out[id] = inp ? inp.value.trim() : (m.isGlass ? String(PCR_GLASS_FIXED) : "");
+    });
+    return out;
   }
 
   // ------------------------------------------------------------------
@@ -220,13 +268,18 @@
   function collectPayload() {
     const data = calcPallet();
     const ids = composition;
-    const isPCR = hasPCR(ids);
+    const plasticPCR = hasPlasticPCR(ids);
+    const glassPCR = hasGlassPCR(ids);
     const isGlass = hasGlassMaterial(ids);
+    const pcrPercent = collectPCRPercentages();
 
-    // Gather material names for page 2 table
+    // Gather material names for page 2 table (con % PCR se presente)
     var materialNames = ids.map(function (id) {
       var m = findMaterial(id);
-      return m ? m.label : id;
+      if (!m) return id;
+      var label = m.label;
+      if (m.pcr && pcrPercent[id]) label += " (PCR " + pcrPercent[id] + "%)";
+      return label;
     });
 
     // Pallet notes: fixed + selected variable
@@ -249,7 +302,9 @@
       materiali: materialNames,
       materialIds: ids.slice(),
       materiale: materialNames[0] || "",
-      pcr: isPCR,
+      pcr: plasticPCR,             // food contact omesso SOLO se plastica PCR
+      glassPCR: glassPCR,          // vetro PCR mantiene il food contact
+      pcrPercent: pcrPercent,
       isGlass: isGlass,
       glassType: $("glassType") ? $("glassType").value : "",
       glassComposition: $("glassComposition") ? $("glassComposition").value.trim() : "",
@@ -267,7 +322,7 @@
       pesoLordoscatola: data.pesoLordoscatola,
       pesoNettoPallet: data.pesoNettoPallet,
       pesoLordopallet: data.pesoLordopallet,
-      palletType: "Fumigated EPAL (1200*800 mm)",
+      palletType: $("palletType") ? $("palletType").value.replace(/^Pallet type: /, "") : "Fumigated EPAL (1200*800 mm)",
       palletHeight: $("altezzaPallet").value.trim() || "114",
       noteBancale: noteBancale,
       bancaleImg: uploaded.bancale || null,
@@ -289,6 +344,11 @@
   ["pesoOggetto", "pezziScatola", "scatoleStrato", "stratiPallet"].forEach((id) =>
     $(id).addEventListener("input", calcPallet)
   );
+  $("altezzaPallet").addEventListener("input", (e) => {
+    const h = e.target.value.trim() || "114";
+    const n = $("palletHeightNote");
+    if (n) n.value = "Pallet height: " + h + " mm";
+  });
 
   $("tdsForm").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -330,7 +390,7 @@
   $("dataCreazione").value = new Date().toISOString().slice(0, 10);
   populateMaterialSelect();
   populateGlassComposition();
-  composition = ["hdpe", "colour_masterbatch", "glass_uvgl"]; // default demo
+  composition = ["glass_formulation", "glass_uvgl", "hdpe"]; // default demo
   renderComposition();
   updateCompositionLogic();
   calcPallet();

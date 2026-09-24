@@ -52,9 +52,11 @@
           <!-- popolato da JS -->
         </div>
 
-        <p class="hint" id="compositionHint">Seleziona un materiale dalla lista e premi "+ Aggiungi" per costruire la composizione del prodotto.</p>
+        <p class="hint" id="compositionHint">Seleziona un materiale dalla lista e premi "+ Aggiungi" per costruire la composizione del prodotto. Le voci con tooltip <span class="tt-dot">?</span> hanno note da leggere al passaggio del mouse.</p>
 
-        <p class="hint" id="foodContactAlert" hidden>⚠ Hai selezionato materiale PCR: il paragrafo relativo al food contact verrà <strong>rimosso</strong> dalla TDS.</p>
+        <div id="pcrBox" class="pcr-box" hidden></div>
+
+        <p class="hint" id="foodContactAlert" hidden>⚠ Hai selezionato materiale <strong>plastica PCR</strong>: il paragrafo relativo al food contact verrà rimosso dalla TDS (per il vetro PCR viene mantenuto).</p>
       </section>
 
       <!-- ═══ 3 · ETICHETTATURA (1-C) ═══ -->
@@ -63,14 +65,19 @@
         <div class="grid">
           <label>Pack Coding
             <select id="packCoding">
-              <option value="HDPE 2">HDPE 2</option>
-              <option value="LDPE 4">LDPE 4</option>
-              <option value="PP 5">PP 5</option>
-              <option value="PET 1">PET 1</option>
-              <option value="GL 70">GL 70 (vetro)</option>
-              <option value="C/PP 92">C/PP 92 (foamer/spray/dispenser)</option>
-              <option value="C/PP 95">C/PP 95 (contaggocce)</option>
-              <option value=">PP+PE+KRESIN< 7">&gt;PP+PE+KRESIN&lt; 7</option>
+              <option value="HDPE 2" title="HDPE – high density polyethylene">HDPE 2</option>
+              <option value="LDPE 4" title="LDPE – low density PE; PE a densità non specificata">LDPE 4</option>
+              <option value="PP 5" title="PP; PP+PE con PP>PE; PP PCR">PP 5</option>
+              <option value="PETG 7" title="PETG">PETG 7</option>
+              <option value="PET 1" title="PET">PET 1</option>
+              <option value="GL 70" title="Glass – vetro">GL 70 (vetro)</option>
+              <option value="C/PP 92" title="Foamer, spray, dispenser">C/PP 92 (foamer/spray/dispenser)</option>
+              <option value="C/PP 95" title="Contagocce">C/PP 95 (contaggocce)</option>
+              <option value="C/UF 95" title="Contagocce in urea">C/UF 95 (contaggocce in urea)</option>
+              <option value=">PP+PE+KRESIN< 7" title="Mix PP+PE+K-resin">PP+PE+KRESIN</option>
+              <option value="UF 7" title="100% urea">UF 7 (100% urea)</option>
+              <option value=">PP+UF< 7" title="Urea + PP">PP+UF</option>
+              <option value=">PE+UF< 7" title="Urea + PE">PE+UF</option>
             </select>
           </label>
           <label>Collection type
@@ -118,6 +125,12 @@
           </label>
         </div>
         <div class="grid">
+          <label class="full">Nota fissa – pallet type
+            <input type="text" id="palletType" value="Pallet type: Fumigated EPAL (1200*800 mm)" readonly />
+          </label>
+          <label class="full">Nota fissa – pallet height
+            <input type="text" id="palletHeightNote" value="Pallet height: 114 mm" readonly />
+          </label>
           <label class="full">Nota bancale 1 (fissa)
             <input type="text" id="notaBancale1" value="Plastic bag inside carton box" />
           </label>
