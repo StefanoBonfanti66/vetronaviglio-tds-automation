@@ -74,6 +74,7 @@
   p.body { font-size: 10.5pt; line-height: 1.4; margin-bottom: 2.5mm; }
   p.stmt-t { font-weight: 700; font-size: 10.5pt; margin: 4mm 0 1mm; }
   p.stmt-b { text-align: justify; font-size: 10.5pt; line-height: 1.4; margin-bottom: 2mm; }
+  .signature { display: block; width: 42mm; max-height: 20mm; object-fit: contain; margin-top: 2mm; margin-left: auto; }
   .omit {
     color: #d9480f; font-style: italic; font-size: 10pt;
     margin: 4mm 0; border-left: 3px solid #d9480f; padding-left: 3mm;
@@ -87,6 +88,13 @@
   table.tbl th { font-family: "Arimo", "Arial", "Liberation Sans", sans-serif; font-size: 9pt; font-weight: 700; }
   table.tbl td { text-align: left; vertical-align: middle; }
   table.tbl .num { text-align: center; }
+  table.materials-table { table-layout: fixed; }
+  table.materials-table th, table.materials-table td { padding: 1.2mm; }
+  table.materials-table .component { vertical-align: top; font-size: 8.5pt; line-height: 1.2; }
+  table.materials-table .component-title { margin-bottom: 1mm; text-align: center; font-weight: 700; }
+  table.materials-table .component-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2mm; text-align: center; }
+  table.materials-table .component-name { text-align: center; }
+  table.materials-table .component-value { text-align: center; }
 
   /* TOC pagina 1 */
   .toc { width: 100%; border-collapse: collapse; margin: 2mm 0 8mm; }
@@ -226,12 +234,19 @@
 
   <p class="body">The list of materials used for the manufacturing of the product included in your project is as below:</p>
 
-  <table class="tbl">
+  <table class="tbl materials-table">
+    <colgroup>
+      <col style="width:40mm;" />
+      <col style="width:25mm;" />
+      <col style="width:43mm;" />
+      <col style="width:62mm;" />
+    </colgroup>
     <thead>
       <tr>
-        <th style="width:50mm;">PRODUCT DESCRIPTION</th>
-        <th style="width:34mm;">PRODUCT CODE</th>
+        <th>PRODUCT DESCRIPTION</th>
+        <th>PRODUCT CODE</th>
         <th>MATERIALS</th>
+        <th>COMPONENT</th>
       </tr>
     </thead>
     <tbody>
@@ -239,19 +254,10 @@
         <td id="mDesc" style="white-space:pre-line;"></td>
         <td id="mCode" class="num"></td>
         <td id="mMat">- HIGH DENSITY POLYETHYLENE<br />- COLOUR MASTERBATCH<br />- INK / UVGL</td>
+        <td id="mComp" class="component"></td>
       </tr>
     </tbody>
   </table>
-
-  <div id="glassCompBlock" hidden>
-    <p class="stmt-t">Glass chemical composition (<span id="gTypeLabel"></span>) (% w/w)</p>
-    <table class="tbl glass-comp">
-      <thead>
-        <tr><th style="width:60mm;">Component</th><th>Min (% w/w)</th><th>Max (% w/w)</th></tr>
-      </thead>
-      <tbody id="glassCompPrintBody"></tbody>
-    </table>
-  </div>
 
   <footer class="tds-footer">
     <img src="assets/coda.png" alt="Vetronaviglio - piè di pagina" />
@@ -305,6 +311,7 @@
     <div>Vetronaviglio S.r.l.</div>
     <div>Quality Assurance Manager</div>
     <div style="font-weight:700;">Federico Rosi</div>
+    <img class="signature" src="assets/firma.jpg" alt="Firma Federico Rosi" />
   </div>
 
   <footer class="tds-footer">
@@ -414,6 +421,7 @@
   </div>
 </section>
 
+<script src="data.js?v=5"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 (function () {
@@ -433,7 +441,7 @@
   }
   function $(id) { return document.getElementById(id); }
 
-  var rev = state ? "Rev. " + state.revisione + " del " + fmtDate(state.dataCreazione) : "";
+  var rev = state ? "Rev. " + TDS_REVISION + " del " + TDS_REVISION_DATE : "";
   for (var i = 1; i <= 7; i++) { var elR = $("pRev" + i); if (elR) elR.textContent = rev; }
 
   var usage = state ? "Campione: " + state.codiceArticolo : "Anteprima vuota";
@@ -443,41 +451,45 @@
 
   // PAG 1
   $("pBareggio1").textContent = "Bareggio, " + fmtDate(state.dataCreazione);
-  $("revDateCell").textContent = fmtDate(state.dataCreazione);
-  $("revNumCell").textContent = state.revisione;
+  $("revDateCell").textContent = TDS_REVISION_DATE;
+  $("revNumCell").textContent = TDS_REVISION;
 
   // PAG 2
   $("mDesc").textContent = state.nomeArticolo;
   $("mCode").textContent = state.codiceArticolo;
   var matHtml = (state.materiali || []).map(function (m) { return "- " + m; }).join("<br />");
-  // Se è presente vetro, aggiungi riga composizione vetro
-  if (state.isGlass) {
-    var gt = state.glassType || "Flint Glass";
-    var gc = state.glassComposition || "";
-    matHtml += "<br /><em>[VETRO] " + gt;
-    if (gc) matHtml += " – " + gc;
-    matHtml += "</em>";
-  }
   $("mMat").innerHTML = matHtml;
 
-  // Tabella composizione chimica vetro (solo se vetro + righe presenti)
-  var gcBody = $("glassCompPrintBody");
-  var gcBlock = $("glassCompBlock");
-  var hasRows = !!(state.glassCompositionRows && state.glassCompositionRows.length);
-  if (state.isGlass && hasRows) {
-    $("gTypeLabel").textContent = state.glassType || "Flint Glass";
-    gcBody.innerHTML = state.glassCompositionRows.map(function (r) {
-      return "<tr><td>" + r.name + "</td><td class=\"num\">" + r.min + "</td><td class=\"num\">" + r.max + "</td></tr>";
-    }).join("");
-    gcBlock.hidden = false;
-  } else {
-    gcBody.innerHTML = "";
-    gcBlock.hidden = true;
+  function renderComponentCell() {
+    var cell = $("mComp");
+    cell.innerHTML = "";
+    if (!state.isGlass) {
+      cell.textContent = "—";
+      return;
+    }
+    var title = document.createElement("div");
+    title.className = "component-title";
+    title.textContent = "Glass chemical composition (" + GLASS_TYPE_FIXED + ") (% w/w)";
+    cell.appendChild(title);
+    GLASS_COMPOSITION_DEFAULT.forEach(function (r) {
+      var row = document.createElement("div");
+      row.className = "component-row";
+      var name = document.createElement("span");
+      name.className = "component-name";
+      name.textContent = r.name;
+      var value = document.createElement("span");
+      value.className = "component-value";
+      value.textContent = r.min + " - " + r.max;
+      row.appendChild(name);
+      row.appendChild(value);
+      cell.appendChild(row);
+    });
   }
+  renderComponentCell();
 
   // PAG 3
   if (state.pcr) {
-    $("stmt5").innerHTML = '<p class="omit">[PARAGRAFO FOOD CONTACT OMESSO – materiale PCR]</p>';
+    $("stmt5").innerHTML = "";
   } else {
     $("stmt5").innerHTML =
       '<p class="stmt-t">Statement of compliance to Regulations and Directives on materials and articles intended to come into contact with food (Regulation (EC) N.1935/2004 and Regulation (EC) N.10/2011)</p>' +

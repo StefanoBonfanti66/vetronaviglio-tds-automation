@@ -90,18 +90,21 @@ const LAYOUT_STANDARD = {
    Valori di default "Flint Glass" (% w/w) presi dalla TDS QC030.0389
    e confermati da Chiara (spec 2.0). Ogni riga: {name, min, max}.  */
 const GLASS_COMPOSITION_DEFAULT = [
-  { name: "SiO2",   min: "72",     max: "74" },
-  { name: "SO3",    min: "0.2",    max: "0.4" },
-  { name: "Na2O",   min: "11",     max: "14" },
-  { name: "K2O",    min: "0",      max: "2" },
+  { name: "SiO₂",   min: "72",     max: "74" },
+  { name: "SO₃",    min: "0.2",    max: "0.4" },
+  { name: "Na₂O",   min: "11",     max: "14" },
+  { name: "K₂O",    min: "0",      max: "2" },
   { name: "CaO",    min: "9",      max: "13" },
   { name: "MgO",    min: "0",      max: "3" },
-  { name: "Al2O3",  min: "1",      max: "3" },
-  { name: "Fe2O3",  min: "0.02",   max: "0.05" },
+  { name: "Al₂O₃",  min: "1",      max: "3" },
+  { name: "Fe₂O₃",  min: "0.02",   max: "0.05" },
 ];
 
 /* ── Percentuale PCR fissata per il vetro (spec Chiara) ────────── */
 const PCR_GLASS_FIXED = 30;
+const GLASS_TYPE_FIXED = "Flint Glass";
+const TDS_REVISION = "4";
+const TDS_REVISION_DATE = "30/09/2022";
 
 /* ── Utility: trova materiale per ID ──────────────────────────── */
 function findMaterial(id) {

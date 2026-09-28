@@ -183,6 +183,8 @@
   // Composizione chimica vetro (tabella ossidi, default Flint Glass)
   // ------------------------------------------------------------------
   function populateGlassComposition() {
+    const type = $("glassFixedType");
+    if (type) type.value = GLASS_TYPE_FIXED;
     const tbody = $("glassCompBody");
     if (!tbody) return;
     tbody.innerHTML = "";
@@ -190,23 +192,10 @@
       const tr = document.createElement("tr");
       tr.innerHTML =
         "<td>" + row.name + "</td>" +
-        '<td><input type="text" class="gc-min" value="' + row.min + '" /></td>' +
-        '<td><input type="text" class="gc-max" value="' + row.max + '" /></td>';
+        "<td>" + row.min + "</td>" +
+        "<td>" + row.max + "</td>";
       tbody.appendChild(tr);
     });
-  }
-
-  function collectGlassComposition(state) {
-    const rows = [];
-    document.querySelectorAll("#glassCompBody tr").forEach(function (tr) {
-      const cells = tr.querySelectorAll("td");
-      if (cells.length < 3) return;
-      const name = cells[0].textContent.trim();
-      const min = cells[1].querySelector("input").value.trim();
-      const max = cells[2].querySelector("input").value.trim();
-      rows.push({ name: name, min: min, max: max });
-    });
-    state.glassCompositionRows = rows;
   }
 
   function onDispositionChange() {    const disp = LAYOUT_STANDARD[$("disposizioneBancale").value];
@@ -293,10 +282,9 @@
       }
     }
 
-    // Collect glass composition rows (tabella ossidi)
     var payload = {
       dataCreazione: $("dataCreazione").value || new Date().toISOString().slice(0, 10),
-      revisione: $("revisione").value || "0",
+      revisione: TDS_REVISION,
       nomeArticolo: $("nomeArticolo").value.trim(),
       codiceArticolo: $("codiceArticolo").value.trim(),
       materiali: materialNames,
@@ -306,8 +294,6 @@
       glassPCR: glassPCR,          // vetro PCR mantiene il food contact
       pcrPercent: pcrPercent,
       isGlass: isGlass,
-      glassType: $("glassType") ? $("glassType").value : "",
-      glassComposition: $("glassComposition") ? $("glassComposition").value.trim() : "",
       packCoding: $("packCoding").value,
       collectionType: $("collectionType").value,
       disegnoBancale: $("disegnoBancale").selectedOptions[0]?.text || $("disegnoBancale").value,
@@ -328,7 +314,6 @@
       bancaleImg: uploaded.bancale || null,
       pezzoImg: uploaded.pezzo || null,
     };
-    collectGlassComposition(payload);
     return payload;
   }
 
@@ -366,7 +351,7 @@
         status.textContent = "File troppo pesanti per l'anteprima (limite localStorage). Usa disegni più leggeri (JPG/PNG) oppure non caricarli.";
         return;
       }
-      window.open("print.html?v=4", "_blank");
+      window.open("print.html?v=6", "_blank");
       status.innerHTML = `✅ Anteprima aperta: seleziona <strong>"Salva come PDF"</strong> nel dialogo di stampa
         (Margini: <strong>Nessuno</strong>) per generare <strong>TDS_${slug(payload.codiceArticolo)}.pdf</strong>.`;
     } catch (err) {
@@ -388,6 +373,7 @@
   // init
   // ------------------------------------------------------------------
   $("dataCreazione").value = new Date().toISOString().slice(0, 10);
+  $("revisione").value = TDS_REVISION;
   populateMaterialSelect();
   populateGlassComposition();
   composition = ["glass_formulation", "glass_uvgl", "hdpe"]; // default demo

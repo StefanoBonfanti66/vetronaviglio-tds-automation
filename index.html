@@ -24,8 +24,8 @@
           <label>Data di creazione
             <input type="date" id="dataCreazione" required />
           </label>
-          <label>Revisione
-            <input type="text" id="revisione" value="5" />
+          <label>Revisione (fissa)
+            <input type="text" id="revisione" value="4" readonly />
           </label>
           <label class="full">Nome articolo
             <input type="text" id="nomeArticolo" value="FLAC. KAPPA 150 PEHD ST NERO COPRENTE B/FOAMER - SER. PURE FOAM CLEANSER - ALLINEATO" />
@@ -151,16 +151,10 @@
       <!-- ═══ 5 · COMPOSIZIONE VETRO (condizionale) ═══ -->
       <section id="glassSection" hidden>
         <h2>5 · Composizione vetro <span class="auto" id="glassBadge">vetro rilevato</span></h2>
-        <p class="hint full">Sezione applicabile solo per prodotti con componenti in vetro. La composizione del vetro verrà visualizzata nella TDS (pag. 2). I valori di default sono quelli del vetro Flint (rif. QC030.0389): modificali secondo la specifica del fornitore.</p>
+        <p class="hint full">Sezione applicabile solo per prodotti con componenti in vetro. La composizione è fissa e viene riportata nella TDS a pag. 2 secondo la specifica Flint Glass (rif. QC030.0389).</p>
         <div class="grid">
           <label class="full">Tipo di vetro
-            <select id="glassType">
-              <option value="Flint Glass">Flint Glass</option>
-              <option value="sodico">Vetro sodico (Na₂O)</option>
-              <option value="borosilicato">Vetro borosilicato</option>
-              <option value="piombo">Vetro al piombo (cristallo)</option>
-              <option value="altro">Altro</option>
-            </select>
+            <input type="text" id="glassFixedType" value="Flint Glass" readonly />
           </label>
         </div>
         <table class="glass-comp" id="glassCompTable">
@@ -171,9 +165,6 @@
             <!-- popolato da JS -->
           </tbody>
         </table>
-        <label class="full">Note sul vetro (opzionali)
-          <input type="text" id="glassComposition" placeholder="es. composizione specifica o riferimento fornitore" />
-        </label>
       </section>
 
       <!-- ═══ 6 · DISEGNI ═══ -->
@@ -211,7 +202,7 @@
     </form>
   </main>
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="data.js?v=5"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

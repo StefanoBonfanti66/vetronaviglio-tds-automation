@@ -2,7 +2,9 @@
 
 **Stato:** POC esplorativo – costo zero (lavoro da dipendente)
 **Proprietario:** Stefano Bonfanti (QA collaboration with Chiara Garramone)
-**Output atteso:** un unico PDF TDS per prodotto
+**Output atteso:** un unico PDF TDS per prodotto, sempre di 7 pagine A4
+**Revisione TDS:** fissa `Rev. 4 del 30/09/2022`; la data di creazione resta dinamica
+**Firma:** `assets/firma.jpg` sotto il blocco Quality Assurance Manager / Federico Rosi
 
 ## Indice
 - `docs/questionario-tds-chiara.md` – domande per Chiara (raccolta dati menù/tendenze)
@@ -33,13 +35,18 @@ branch `main`) — essendo statico nessun backend richiesto.
   (Vetro / Plastica / Meccanica), con etichette e ruoli (Meccanismo, Molla, Dispenser e spray)
 - Composizione **multi-materiale**: aggiungi/rimuovi chip per costruire l'elenco materiali
 - **PCR** rilevato automaticamente dalla selezione (PP PCR / PE PCR) → rimuove il paragrafo
-  food contact con alert
-- **Vetro** rilevato automaticamente → mostra la sezione "Composizione vetro" e aggiunge
-  la riga vetro nella tabella materiali; pack coding `GL 70` proposto automaticamente
+  food contact; nel form resta l'avviso, nella stampa non viene mostrato alcun marker
+- **Vetro** rilevato automaticamente → mostra la sezione "Composizione vetro"; pack coding
+  `GL 70` proposto automaticamente. La colonna `MATERIALS` della tabella a pag. 2 elenca
+  **solo i materiali selezionati**: la voce `[VETRO] Flint Glass` non viene più stampata
 - **Etichettatura automatica**: `determinePackCoding()` suggerisce Pack Coding + Collection
   type dalla composizione (GL 70, HDPE 2, LDPE 4, PP 5, C/PP 92, C/PP 95, K-RESIN)
-- **Composizione vetro** condizionale: tabella ossidi (default Flint Glass da
-  `QC030.0389_TDS.pdf`), renderizzata a pag. 2 della TDS
+- **Composizione vetro** condizionale: i valori fissi Flint Glass, uguali alla specifica
+  `QC030.0389_TDS.pdf`, confluiscono nella colonna `COMPONENT` della tabella materiali a pag. 2
+  con notazione chimica a pedici (`SiO₂`, `SO₃`, `Na₂O`, `K₂O`, `CaO`, `MgO`, `Al₂O₃`, `Fe₂O₃`);
+  non viene renderizzata una seconda tabella
+- **Revisione e firma**: revisione fissa Rev. 4 del 30/09/2022, data di creazione dinamica e
+  firma di Federico Rosi sotto il blocco Quality Assurance Manager
 - Calcolo bancale allineato al foglio Excel di Chiara (`docs/Calcolatore automatico
   pallettizzazione 2.0.xlsx`): input peso oggetto, pezzi/scatola, scatole/strato,
   strati/pallet; derivati scatole/pallet, pezzi/pallet, pesi netto/lordo (cartone +0,5 Kg,
