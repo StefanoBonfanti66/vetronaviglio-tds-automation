@@ -238,15 +238,15 @@
     <colgroup>
       <col style="width:40mm;" />
       <col style="width:25mm;" />
-      <col style="width:43mm;" />
-      <col style="width:62mm;" />
+      <col id="mColMat" style="width:43mm;" />
+      <col id="mColComp" style="width:62mm;" />
     </colgroup>
     <thead>
       <tr>
         <th>PRODUCT DESCRIPTION</th>
         <th>PRODUCT CODE</th>
         <th>MATERIALS</th>
-        <th>COMPONENT</th>
+        <th id="mThComp">COMPONENT</th>
       </tr>
     </thead>
     <tbody>
@@ -461,12 +461,23 @@
   $("mMat").innerHTML = matHtml;
 
   function renderComponentCell() {
-    var cell = $("mComp");
-    cell.innerHTML = "";
+    // La colonna COMPONENT esiste solo se è selezionato almeno un materiale
+    // in vetro. In tutti gli altri casi la colonna viene rimossa e la
+    // colonna MATERIALS si estende fino al margine destro.
     if (!state.isGlass) {
-      cell.textContent = "—";
+      ["mThComp", "mComp"].forEach(function (id) {
+        var el = $(id);
+        if (el) el.style.display = "none";
+      });
+      // la colonna viene rimossa dal colgroup: MATERIALS si estende a 105mm
+      // (40 + 25 + 105 = 170mm = tutta la larghezza utile della pagina A4)
+      var col = $("mColComp");
+      if (col && col.parentNode) col.parentNode.removeChild(col);
+      $("mColMat").style.width = "105mm";
       return;
     }
+    var cell = $("mComp");
+    cell.innerHTML = "";
     var title = document.createElement("div");
     title.className = "component-title";
     title.textContent = "Glass chemical composition (" + GLASS_TYPE_FIXED + ") (% w/w)";

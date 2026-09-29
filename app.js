@@ -262,11 +262,22 @@
     const isGlass = hasGlassMaterial(ids);
     const pcrPercent = collectPCRPercentages();
 
+    // Rimuove le parentesi esplicative finali da un'etichetta materiale.
+    function stripParenthesis(label) {
+      return String(label)
+        .replace(/\s*\([^()]*\)\s*$/, "")
+        .trim();
+    }
+
     // Gather material names for page 2 table (con % PCR se presente)
+    // Le parentesi esplicative si mantengono SOLO per le materie plastiche
+    // (categoria "Plastica", es. POLYPROPYLENE (PP)); per vetro, decorazioni,
+    // meccanica, altri materiali e riciclati il nome resta pulito.
+    // Il suffisso " (PCR N%)" viene comunque aggiunto in fondo.
     var materialNames = ids.map(function (id) {
       var m = findMaterial(id);
       if (!m) return id;
-      var label = m.label;
+      var label = m.category === "Plastica" ? m.label : stripParenthesis(m.label);
       if (m.pcr && pcrPercent[id]) label += " (PCR " + pcrPercent[id] + "%)";
       return label;
     });
@@ -351,7 +362,7 @@
         status.textContent = "File troppo pesanti per l'anteprima (limite localStorage). Usa disegni più leggeri (JPG/PNG) oppure non caricarli.";
         return;
       }
-      window.open("print.html?v=6", "_blank");
+      window.open("print.html?v=7", "_blank");
       status.innerHTML = `✅ Anteprima aperta: seleziona <strong>"Salva come PDF"</strong> nel dialogo di stampa
         (Margini: <strong>Nessuno</strong>) per generare <strong>TDS_${slug(payload.codiceArticolo)}.pdf</strong>.`;
     } catch (err) {
