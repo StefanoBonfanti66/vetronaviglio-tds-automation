@@ -13,6 +13,7 @@ const MATERIAL_CATALOG = [
   { id: "hdpe",              category: "Plastica", label: "HIGH DENSITY POLYETHYLENE (HDPE)", group: "plastic" },
   { id: "ldpe",              category: "Plastica", label: "LOW DENSITY POLYETHYLENE (LDPE)", group: "plastic" },
   { id: "petg",              category: "Plastica", label: "PETG (POLYETHYLENE TEREPHTHALATE GLYCOL)", group: "plastic", tip: "PETG" },
+  { id: "san",               category: "Plastica", label: "SAN 7 - Plastic",                group: "plastic", tip: "Codice etichetta SAN 7" },
   { id: "colour_masterbatch", category: "Plastica", label: "COLOUR MASTERBATCH",             group: "plastic" },
 
   // ── Decorazioni (applicabili a vetro E plastica) ────────────────
@@ -51,6 +52,7 @@ const PACK_CODING_MAP = {
   pe:     { code: "LDPE 4",    collection: "Plastic" },
   pp:     { code: "PP 5",      collection: "Plastic" },
   petg:   { code: "PETG 7",    collection: "Plastic" },
+  san:    { code: "SAN 7",     collection: "Plastic" },
   k_resin:{ code: ">PP+PE+KRESIN< 7", collection: "Plastic" },
   urea:     { code: "UF 7",    collection: "Plastic" },
   urea_pp:  { code: ">PP+UF< 7", collection: "Plastic" },
@@ -76,13 +78,14 @@ const PALLET_NOTES_VARIABLE = [
   "Plastic film on top of the items for dust protection",
   "2 ply centre plate on alternate layer",
   "Side edge angle board",
+  "Items are aligned",
 ];
 
 /* ── Disposizioni bancale (layout standard) ────────────────────── */
 const LAYOUT_STANDARD = {
-  std1: { scatolePerStrato: 3, strati: 3, descr: "3 strati × 3 scatole" },
-  std2: { scatolePerStrato: 2, strati: 4, descr: "4 strati × 2 scatole" },
-  std3: { scatolePerStrato: 5, strati: 2, descr: "2 strati × 5 scatole" },
+  std1: { code: "BX01.0005", scatolePerStrato: 3, strati: 3, descr: "3 strati × 3 scatole" },
+  std2: { code: "BX01.0004", scatolePerStrato: 4, strati: 4, descr: "4 strati × 4 scatole" },
+  std3: { code: "BB000.0003", scatolePerStrato: 6, strati: 3, descr: "3 strati × 6 scatole" },
   forn: { scatolePerStrato: 4, strati: 3, descr: "da fornitore (vetro/accessori)" },
 };
 
@@ -145,6 +148,7 @@ function determinePackCoding(materialIds) {
   }
 
   if (materialIds.includes("petg")) return PACK_CODING_MAP.petg;
+  if (materialIds.includes("san")) return PACK_CODING_MAP.san;
 
   // PP+PE o PP+PP_PCR → PP 5
   if (hasPP && (hasPE || hasPP_PCR || hasHDPE || hasLDPE)) return PACK_CODING_MAP.pp;
