@@ -421,7 +421,7 @@
   </div>
 </section>
 
-<script src="data.js?v=6"></script>
+<script src="data.js?v=7"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 (function () {
@@ -441,7 +441,25 @@
   }
   function $(id) { return document.getElementById(id); }
 
-  var rev = state ? "Rev. " + TDS_REVISION + " del " + TDS_REVISION_DATE : "";
+  function buildRevision(rev, date) {
+    var r = rev != null ? String(rev).trim() : "";
+    var d = date != null ? String(date).trim() : "";
+    if (!r && !d) return "";
+    if (!r) return "";
+    var hasRevPrefix = /^rev\./i.test(r);
+    var hasDate = /\d{1,2}\/\d{1,2}\/\d{4}/.test(r);
+    if (!hasRevPrefix) {
+      r = "Rev. " + r;
+    } else if (/^rev\./i.test(r) && !/^Rev\./.test(r)) {
+      r = "Rev." + r.slice(4);
+    }
+    if (!hasDate && d) {
+      r = r + " del " + d;
+    }
+    return r;
+  }
+
+  var rev = state ? buildRevision(TDS_REVISION, TDS_REVISION_DATE) : "";
   for (var i = 1; i <= 7; i++) { var elR = $("pRev" + i); if (elR) elR.textContent = rev; }
 
   var usage = state ? "Campione: " + state.codiceArticolo : "Anteprima vuota";
