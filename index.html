@@ -7,12 +7,21 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>TDS Automation – POC Vetronaviglio</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
-  <header>
-    <h1>Generatore TDS <span class="sub">POC – Vetronaviglio</span></h1>
-    <p class="tagline">Compila il form e genera l'<strong>unico PDF</strong> della Technical Data Sheet.</p>
+  <header class="app-header">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="Vetronaviglio">
+        <img src="assets/logo-small.png" alt="Vetronaviglio" class="brand-logo" />
+      </a>
+      <div class="header-copy">
+        <div class="eyebrow">VETRONAVIGLIO · INTRANET</div>
+        <h1>TDS Automation <span class="sub">Generatore Technical Data Sheet</span></h1>
+        <p class="tagline">Configura i dati tecnici del prodotto e genera il PDF TDS pronto per la condivisione.</p>
+      </div>
+      <div class="header-badge" aria-label="Ambiente POC">POC <span>Intranet</span></div>
+    </div>
   </header>
 
   <main>
@@ -69,6 +78,7 @@
               <option value="LDPE 4" title="LDPE – low density PE; PE a densità non specificata">LDPE 4</option>
               <option value="PP 5" title="PP; PP+PE con PP>PE; PP PCR">PP 5</option>
               <option value="PETG 7" title="PETG">PETG 7</option>
+              <option value="SAN 7" title="SAN (Styrene Acrylonitrile)">SAN 7</option>
               <option value="PET 1" title="PET">PET 1</option>
               <option value="GL 70" title="Glass – vetro">GL 70 (vetro)</option>
               <option value="C/PP 92" title="Foamer, spray, dispenser">C/PP 92 (foamer/spray/dispenser)</option>
@@ -203,7 +213,7 @@
     </form>
   </main>
 
-  <script src="data.js?v=6"></script>
-  <script src="app.js?v=5"></script>
+  <script src="data.js?v=7"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

@@ -2,6 +2,14 @@
 
 > Note operative per agenti AI e futuri sviluppatori (Stefano, ZBN).
 
+## Stato attuale (2026-10-22)
+- **Integrazione completata**: restyling intranet (header con logo, eyebrow, badge) + codifica SAN/SAN 7 (catalogo: "SAN", pack coding: "SAN 7" / Plastic)
+- **Test Playwright superati**: form carica, selezione materiali, calcolo bancale, anteprima print.html?v=7 (7 pagine, 0 errori JS), pack coding SAN 7 auto-suggest
+- **Ripristinata compatibilità**: GLASS_TYPE_FIXED, PCR_GLASS_FIXED, TDS_REVISION_DATE, LAYOUT_STANDARD, GLASS_COMPOSITION_DEFAULT, hasGlassMaterial (da copia online)
+- **Cache-busting allineato**: style.css?v=7, data.js?v=7, app.js?v=6, print.html?v=7
+- **Deploy NON eseguito**: commit locale pronto, push/ deploy rimandati
+- **Problema noto separato**: revisione duplicata "Rev. Rev. 4 del 30/09/2022 del 30/09/2022" in print.html (da correggere in prossimo step)
+
 ## ⚠️ NON MODIFICARE: flusso disegno tecnico (pag. 7) e stampa
 
 Il POC è stato validato da Stefano (2026-09-08) e **funziona solo con queste regole**.
@@ -18,7 +26,7 @@ originale (pagina 7 senza disegno + ottava pagina vuota nell'export dal dialogo 
    (stesso pattern di `.drawing-box img.fit` di pag. 6, che stampa bene).
 3. **Funzione `tdsShowPlaceholder(msg)`**: fallback senza embed. Timeout rasterizzazione 20s.
    Niente altri percorsi alternativi per il disegno.
-4. **Cache busting**: da `app.js` aprire sempre `print.html?v=CURRENT` (oggi `?v=6`).
+4. **Cache busting**: da `app.js` aprire sempre `print.html?v=CURRENT` (oggi `?v=7`).
    Bumpa il numero **ad ogni modifica** di print.html, altrimenti il browser serve una
    versione vecchia in cache e il cliente "non vede il disegno / ottava pagina vuota".
    In print.html ci sono anche meta `Cache-Control: no-store` / `Pragma: no-cache`.
@@ -39,6 +47,25 @@ originale (pagina 7 senza disegno + ottava pagina vuota nell'export dal dialogo 
 - I campi di disegno restano come nell'interfaccia precedente: i selettori conservano il
   nome/reference, mentre il file effettivamente incorporato nella TDS viene caricato da
   `Sfoglia` alle pagine 6/7.
+
+### Stato validato (2026-09-29) — tabella MATERIALS a pag. 2 (commit `cb8f1d2`)
+- **Colonna `COMPONENT` condizionale**: esiste solo se è selezionato almeno un materiale
+  in vetro (`state.isGlass` = `hasGlassMaterial(ids)`). Se non c'è vetro, in
+  `renderComponentCell()` (print.html) vengono nascosti `#mThComp` e `#mComp`, il `<col>`
+  4° viene **rimosso dal colgroup** (il `display:none` sul `<col>` non è affidabile con
+  `table-layout: fixed`) e `#mColMat` passa a `105mm` → MATERIALS arriva al margine destro
+  (40 + 25 + 105 = 170mm = larghezza utile A4, `.page { padding: 12mm 20mm 23mm }`).
+  Non esiste più il placeholder `—` nella colonna.
+- **Parentesi solo per le plastiche**: in `collectPayload()` (app.js) l'helper
+  `stripParenthesis(label)` (regex `/\s*\([^()]*\)\s*$/`) ripulisce l'etichetta **solo se**
+  `m.category !== "Plastica"`. Esempio: `INK / UVGL (Serigrafia)` → `INK / UVGL`,
+  `FROSTED FINISH (Satinato)` → `FROSTED FINISH`, mentre `POLYPROPYLENE (PP)` e
+  `HIGH DENSITY POLYETHYLENE (HDPE)` restano invariati.
+- **Ordine obbligato**: prima si ripulisce dalle parentesi, **poi** si appende il suffisso
+  ` (PCR N%)` (che va SEMPRE mantenuto, vetro e riciclati compresi).
+- Cache busting bumpato `?v=6` → `?v=7`. Verificato in locale (server `http.server` +
+  Playwright: 3 colonne senza vetro / 4 colonne con vetro, larghezza tabella invariata a
+  643.5px = 170mm) e in produzione (GitHub Pages serve `print.html?v=7`).
 
 ## Altri punti fermi
 - `data.js` = catalogo materiali (Chiara), mappa etichette pack-coding (GL70/HDPE2/LDPE4/

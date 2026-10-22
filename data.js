@@ -13,7 +13,7 @@ const MATERIAL_CATALOG = [
   { id: "hdpe",              category: "Plastica", label: "HIGH DENSITY POLYETHYLENE (HDPE)", group: "plastic" },
   { id: "ldpe",              category: "Plastica", label: "LOW DENSITY POLYETHYLENE (LDPE)", group: "plastic" },
   { id: "petg",              category: "Plastica", label: "PETG (POLYETHYLENE TEREPHTHALATE GLYCOL)", group: "plastic", tip: "PETG" },
-  { id: "san",               category: "Plastica", label: "SAN 7 - Plastic",                group: "plastic", tip: "Codice etichetta SAN 7" },
+  { id: "san",               category: "Plastica", label: "SAN",                          group: "plastic", tip: "SAN" },
   { id: "colour_masterbatch", category: "Plastica", label: "COLOUR MASTERBATCH",             group: "plastic" },
 
   // ── Decorazioni (applicabili a vetro E plastica) ────────────────
@@ -81,7 +81,12 @@ const PALLET_NOTES_VARIABLE = [
   "Items are aligned",
 ];
 
-/* ── Disposizioni bancale (layout standard) ────────────────────── */
+/* ── Standard bancale (Chiara) ─────────────────────────────────── */
+const PALLET_STANDARDS = {
+  std1: { name: "BX01.0005", boxesPerLayer: 3, layers: 3, img: "assets/bancale-bx01-0005-3.jpg" },
+  std2: { name: "BX01.0004", boxesPerLayer: 4, layers: 4, img: "assets/bancale-bx01-0004-4.jpg" },
+  std3: { name: "BB000.0003", boxesPerLayer: 6, layers: 3, img: "assets/bancale-bb000-0003-6.jpg" },
+};
 const LAYOUT_STANDARD = {
   std1: { code: "BX01.0005", scatolePerStrato: 3, strati: 3, descr: "3 strati × 3 scatole" },
   std2: { code: "BX01.0004", scatolePerStrato: 4, strati: 4, descr: "4 strati × 4 scatole" },
@@ -89,33 +94,43 @@ const LAYOUT_STANDARD = {
   forn: { scatolePerStrato: 4, strati: 3, descr: "da fornitore (vetro/accessori)" },
 };
 
-/* ── Composizione chimica vetro ───────────────────────────────────
-   Valori di default "Flint Glass" (% w/w) presi dalla TDS QC030.0389
-   e confermati da Chiara (spec 2.0). Ogni riga: {name, min, max}.  */
+/* ── Composizione vetro fissa (Flint Glass) ───────────────────── */
+const GLASS_COMPOSITION = [
+  { component: "SiO\u2082",     min: 68.0, max: 74.0 },
+  { component: "SO\u2083",      min: 0.0,  max: 0.5 },
+  { component: "Na\u2082O",     min: 10.0, max: 16.0 },
+  { component: "K\u2082O",      min: 0.0,  max: 3.0 },
+  { component: "CaO",         min: 5.0,  max: 12.0 },
+  { component: "MgO",         min: 0.0,  max: 5.0 },
+  { component: "Al\u2082O\u2083", min: 0.0,  max: 3.0 },
+  { component: "Fe\u2082O\u2083", min: 0.0,  max: 0.5 },
+];
 const GLASS_COMPOSITION_DEFAULT = [
-  { name: "SiO₂",   min: "72",     max: "74" },
-  { name: "SO₃",    min: "0.2",    max: "0.4" },
-  { name: "Na₂O",   min: "11",     max: "14" },
-  { name: "K₂O",    min: "0",      max: "2" },
+  { name: "SiO\u2082",   min: "72",     max: "74" },
+  { name: "SO\u2083",    min: "0.2",    max: "0.4" },
+  { name: "Na\u2082O",   min: "11",     max: "14" },
+  { name: "K\u2082O",    min: "0",      max: "2" },
   { name: "CaO",    min: "9",      max: "13" },
   { name: "MgO",    min: "0",      max: "3" },
-  { name: "Al₂O₃",  min: "1",      max: "3" },
-  { name: "Fe₂O₃",  min: "0.02",   max: "0.05" },
+  { name: "Al\u2082O\u2083",  min: "1",      max: "3" },
+  { name: "Fe\u2082O\u2083",  min: "0.02",   max: "0.05" },
 ];
 
-/* ── Percentuale PCR fissata per il vetro (spec Chiara) ────────── */
-const PCR_GLASS_FIXED = 30;
-const GLASS_TYPE_FIXED = "Flint Glass";
-const TDS_REVISION = "4";
+/* ── Revisione TDS fissa ───────────────────────────────────────── */
+const TDS_REVISION = "Rev. 4 del 30/09/2022";
 const TDS_REVISION_DATE = "30/09/2022";
+const GLASS_TYPE_FIXED = "Flint Glass";
+const PCR_GLASS_FIXED = 30;
 
-/* ── Utility: trova materiale per ID ──────────────────────────── */
+/* ── Stato composizione multi-materiale ────────────────────────── */
+let composition = [];
+
+/* ── Utility: trova materiale per id ───────────────────────────── */
 function findMaterial(id) {
   return MATERIAL_CATALOG.find(function (m) { return m.id === id; });
 }
 
-/* ── Utility: determina pack coding dalla composizione ────────── */
-/* Ordine di priorità: vetro > K-resin > urea (misti) > PETG > PP/PE/HDPE/LDPE */
+/* ── Pack Coding automatico ────────────────────────────────────── */
 function determinePackCoding(materialIds) {
   var hasGlass = materialIds.some(function (id) {
     var m = findMaterial(id);
@@ -139,6 +154,7 @@ function determinePackCoding(materialIds) {
   var hasHDPE = materialIds.includes("hdpe");
   var hasLDPE = materialIds.includes("ldpe");
   var hasPP_PCR = materialIds.includes("pp_pcr");
+  var hasSAN = materialIds.includes("san");
 
   if (hasUrea) {
     if (hasPP && !hasPE && !hasHDPE && !hasLDPE) return PACK_CODING_MAP.urea_pp;
@@ -148,7 +164,10 @@ function determinePackCoding(materialIds) {
   }
 
   if (materialIds.includes("petg")) return PACK_CODING_MAP.petg;
-  if (materialIds.includes("san")) return PACK_CODING_MAP.san;
+  if (hasSAN) {
+    // Se entrambi presenti, SAN 7 ha precedenza (più specifico)
+    return PACK_CODING_MAP.san;
+  }
 
   // PP+PE o PP+PP_PCR → PP 5
   if (hasPP && (hasPE || hasPP_PCR || hasHDPE || hasLDPE)) return PACK_CODING_MAP.pp;
@@ -176,18 +195,18 @@ function hasPlasticPCR(materialIds) {
   });
 }
 
-/* PCR vetro: il food contact RESTA */
-function hasGlassPCR(materialIds) {
-  return materialIds.some(function (id) {
-    var m = findMaterial(id);
-    return m && m.pcr && m.isGlass;
-  });
-}
-
 /* ── Utility: verifica se ci sono materiali vetro ──────────────── */
 function hasGlassMaterial(materialIds) {
   return materialIds.some(function (id) {
     var m = findMaterial(id);
     return m && m.isGlass;
+  });
+}
+
+/* PCR vetro: il food contact RESTA */
+function hasGlassPCR(materialIds) {
+  return materialIds.some(function (id) {
+    var m = findMaterial(id);
+    return m && m.pcr && m.isGlass;
   });
 }
