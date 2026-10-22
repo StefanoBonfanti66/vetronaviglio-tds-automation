@@ -7,8 +7,21 @@
 - **Test Playwright superati**: form carica, selezione materiali, calcolo bancale, anteprima print.html?v=7 (7 pagine, 0 errori JS), pack coding SAN 7 auto-suggest
 - **Ripristinata compatibilità**: GLASS_TYPE_FIXED, PCR_GLASS_FIXED, TDS_REVISION_DATE, LAYOUT_STANDARD, GLASS_COMPOSITION_DEFAULT, hasGlassMaterial (da copia online)
 - **Cache-busting allineato**: style.css?v=7, data.js?v=7, app.js?v=6, print.html?v=7
-- **Deploy NON eseguito**: commit locale pronto, push/ deploy rimandati
-- **Problema noto separato**: revisione duplicata "Rev. Rev. 4 del 30/09/2022 del 30/09/2022" in print.html (da correggere in prossimo step)
+- **Fix revisione duplicata**: commit 7068c59 risolve "Rev. Rev. 4..." → "Rev. 4 del 30/09/2022"
+- **Deploy completato**: fix 7068c59 pubblicato su APP-DEV-01 (tds.vetrodom.local) via blocco admin manuale
+- **Verifiche superate**: file pubblicato, HTTP 200 + hash contenuto, generazione PDF 7 pagine
+
+## Current Focus (2026-10-22)
+
+### Completato
+- Integrazione restyling online + codifica SAN/SAN 7 in data.js
+- Fix revisione duplicata nel PDF (commit 7068c59)
+- Deploy su APP-DEV-01 (tds.vetrodom.local) via blocco admin manuale
+- Verifiche: file pubblicato, HTTP 200 + hash contenuto, generazione PDF 7 pagine
+
+### Prossimo step
+- Eventuale validazione finale con Chiara su PDF generato
+- Chiusura progetto POC se confermato
 
 ## ⚠️ NON MODIFICARE: flusso disegno tecnico (pag. 7) e stampa
 
