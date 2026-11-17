@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-11-17T00:00:00.000Z",
+  "state": "active",
+  "phase": "Validazione cliente",
+  "next_action": "Far validare a Chiara un PDF di prova con i pesi a una sola cifra decimale (7 pagine A4, disegno a pag. 7); solo dopo deployare la modifica su tds.vetrodom.local con verifica HTTP e hash, e chiudere il POC se confermato."
+}

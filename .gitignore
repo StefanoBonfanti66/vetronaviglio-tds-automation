@@ -1,5 +1,9 @@
 # Documenti interni di lavoro (non pubblicati)
-docs/
+docs/*
+# Eccezione: stato operativo autorizzato per la dashboard ZBN
+!docs/project/
+docs/project/*
+!docs/project/project-status.json
 
 # Log e file temporanei
 *.log
