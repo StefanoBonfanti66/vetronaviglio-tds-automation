@@ -6,22 +6,25 @@
 - **Integrazione completata**: restyling intranet (header con logo, eyebrow, badge) + codifica SAN/SAN 7 (catalogo: "SAN", pack coding: "SAN 7" / Plastic)
 - **Test Playwright superati**: form carica, selezione materiali, calcolo bancale, anteprima print.html?v=7 (7 pagine, 0 errori JS), pack coding SAN 7 auto-suggest
 - **Ripristinata compatibilità**: GLASS_TYPE_FIXED, PCR_GLASS_FIXED, TDS_REVISION_DATE, LAYOUT_STANDARD, GLASS_COMPOSITION_DEFAULT, hasGlassMaterial (da copia online)
-- **Cache-busting allineato**: style.css?v=7, data.js?v=7, app.js?v=6, print.html?v=7
+- **Cache-busting allineato**: style.css?v=7, data.js?v=7, app.js?v=7, print.html?v=8
 - **Fix revisione duplicata**: commit 7068c59 risolve "Rev. Rev. 4..." → "Rev. 4 del 30/09/2022"
 - **Deploy completato**: fix 7068c59 pubblicato su APP-DEV-01 (tds.vetrodom.local) via blocco admin manuale
 - **Verifiche superate**: file pubblicato, HTTP 200 + hash contenuto, generazione PDF 7 pagine
 
-## Current Focus (2026-10-22)
+## Current Focus (2026-11-17)
 
 ### Completato
-- Integrazione restyling online + codifica SAN/SAN 7 in data.js
-- Fix revisione duplicata nel PDF (commit 7068c59)
-- Deploy su APP-DEV-01 (tds.vetrodom.local) via blocco admin manuale
-- Verifiche: file pubblicato, HTTP 200 + hash contenuto, generazione PDF 7 pagine
+- Pesi a una sola cifra decimale con separatore `,` (`f()` in app.js, `numIt()` in print.html): interi senza decimali, per richiesta Chiara 17/11/2026
+- Cache-busting allineato alle nuove versioni: `index.html` carica `app.js?v=7`, `app.js` apre `print.html?v=8`
+- Regola pesi e versioni cache documentate in questo file (sezione "Altri punti fermi")
+- Precedente integrazione restyling + SAN/SAN 7 e fix revisione duplicata (commit 7068c59) già deployati e verificati su APP-DEV-01
+
+### Manca
+- Validazione con Chiara del PDF generato con la nuova formattazione pesi (7 pagine A4, disegno a pag. 7)
+- Deploy della modifica pesi su APP-DEV-01 (tds.vetrodom.local): non ancora eseguito, richiede gate umano
 
 ### Prossimo step
-- Eventuale validazione finale con Chiara su PDF generato
-- Chiusura progetto POC se confermato
+- Far validare a Chiara un PDF di prova con i pesi a una decimale; solo dopo eseguire il deploy su tds.vetrodom.local con verifica HTTP/hash e chiudere il POC se confermato
 
 ## ⚠️ NON MODIFICARE: flusso disegno tecnico (pag. 7) e stampa
 
@@ -39,7 +42,7 @@ originale (pagina 7 senza disegno + ottava pagina vuota nell'export dal dialogo 
    (stesso pattern di `.drawing-box img.fit` di pag. 6, che stampa bene).
 3. **Funzione `tdsShowPlaceholder(msg)`**: fallback senza embed. Timeout rasterizzazione 20s.
    Niente altri percorsi alternativi per il disegno.
-4. **Cache busting**: da `app.js` aprire sempre `print.html?v=CURRENT` (oggi `?v=7`).
+4. **Cache busting**: da `app.js` aprire sempre `print.html?v=CURRENT` (oggi `?v=8`).
    Bumpa il numero **ad ogni modifica** di print.html, altrimenti il browser serve una
    versione vecchia in cache e il cliente "non vede il disegno / ottava pagina vuota".
    In print.html ci sono anche meta `Cache-Control: no-store` / `Pragma: no-cache`.
@@ -87,6 +90,10 @@ originale (pagina 7 senza disegno + ottava pagina vuota nell'export dal dialogo 
 - Calcolo bancale = formula dell'Excel "Calcolatore automatico pallettizzazione 2.0"
   (`scatolePallet = scatoleStrato × strati`, `pezziTotali = pezziScatola × scatolePallet`,
   EPAL 25 Kg, cartone 0,5 Kg/scatola). NON reintrodurre il campo `pezziTotali` manuale.
+- **Pesi (richiesta Chiara 17/11/2026)**: sempre **una sola cifra decimale** con separatore `,`;
+  i valori interi restano senza decimali (`45 Kg` → `45 Kg`, NON `45,0 Kg`). Regola in `f()`
+  (app.js) e `numIt()` (print.html): `Math.round(n * 10) / 10`. NON ripristinare `* 100`
+  (2 decimali) e NON usare `toFixed(1)` (arrotonda male es. 2,05 → 2,0).
 - `docs/` è gitignorata: allegati Chiara (XLSX/PDF/JPG) vivono solo in locale + `docs/brief-tds-poc.md`.
 - Push: usare `env -u GITHUB_TOKEN git push` (GITHUB_TOKEN env è stantio, 401). `gh` autenticato come StefanoBonfanti66.
 - App live: https://stefanobonfanti66.github.io/vetronaviglio-tds-automation/

@@ -362,7 +362,7 @@
         status.textContent = "File troppo pesanti per l'anteprima (limite localStorage). Usa disegni più leggeri (JPG/PNG) oppure non caricarli.";
         return;
       }
-      window.open("print.html?v=7", "_blank");
+      window.open("print.html?v=8", "_blank");
       status.innerHTML = `✅ Anteprima aperta: seleziona <strong>"Salva come PDF"</strong> nel dialogo di stampa
         (Margini: <strong>Nessuno</strong>) per generare <strong>TDS_${slug(payload.codiceArticolo)}.pdf</strong>.`;
     } catch (err) {
@@ -377,7 +377,7 @@
   // helpers
   // ------------------------------------------------------------------
   function set(id, v) { $(id).textContent = v; }
-  function f(n) { return (Math.round(n * 100) / 100).toString().replace(".", ","); }
+  function f(n) { return (Math.round(n * 10) / 10).toString().replace(".", ","); }
   function slug(s) { return String(s).replace(/[^a-zA-Z0-9.-]+/g, ""); }
 
   // ------------------------------------------------------------------

@@ -433,7 +433,7 @@
     if (v === null || v === undefined || v === "") return "—";
     return String(v) + (suffix || "");
   }
-  function numIt(n) { return (Math.round(n * 100) / 100).toString().replace(".", ","); }
+  function numIt(n) { return (Math.round(n * 10) / 10).toString().replace(".", ","); }
   function fmtDate(iso) {
     if (!iso) return "—";
     var p = String(iso).split("-");
